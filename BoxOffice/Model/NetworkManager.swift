@@ -20,7 +20,7 @@ struct NetworkManager {
         return requestURL
     }
     
-    func getBoxOfficeData(requestURL: URLRequest, sessionConfiguration: URLSessionConfiguration, completionHandler: @escaping (BoxOffice) -> Void) {
+    func fetchData<T: Decodable>(requestURL: URLRequest, sessionConfiguration: URLSessionConfiguration, completionHandler: @escaping (T) -> Void) {
         let task = URLSession.shared.dataTask(with: requestURL) { data, response, error in
             guard error == nil else {
                 return
@@ -37,8 +37,8 @@ struct NetworkManager {
             }
             
             do {
-                let boxOfficeData = try JSONDecoder().decode(BoxOffice.self, from: data)
-                completionHandler(boxOfficeData)
+                let receviedDate = try JSONDecoder().decode(T.self, from: data)
+                completionHandler(receviedDate)
             } catch let error {
                 print(error.localizedDescription)
             }
