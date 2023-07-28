@@ -27,13 +27,13 @@ class ViewController: UIViewController {
                     URLQueryItem(name: "wideAreaCd", value: nil)
                 ]
             )
-            let result: BoxOffice = networkManager.fetchData(requestURL: <#T##URLRequest#>, sessionConfiguration: <#T##URLSessionConfiguration#>, completionHandler: <#T##(Decodable) -> Void#>)
+            networkManager.fetchData(requestURL: requestURL, sessionConfiguration: .default) { (boxOffice: BoxOffice) in
+                print(boxOffice)
+            }
         } catch {
             print(error.localizedDescription)
         }
         
     }
-
-
 }
 
