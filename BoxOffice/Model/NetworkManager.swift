@@ -6,21 +6,15 @@
 //
 
 import Foundation
-
-struct NetworkManager {
-    func makeURLRequest(baseURL: String, queryItems: [URLQueryItem]) throws -> URLRequest {
-        guard var baseURL = URL(string: baseURL) else {
-            throw MakeURLRequestError.convertURL
-        }
-        
-        baseURL.append(queryItems: queryItems)
-        
-        let requestURL = URLRequest(url: baseURL)
-        
-        return requestURL
-    }
-    
-    func fetchData<T: Decodable>(requestURL: URLRequest, sessionConfiguration: URLSessionConfiguration, completionHandler: @escaping (T) -> Void) {
+// SOLID 원칙, 내부 분리 필요
+// SRP
+// DIP
+public protocol fetchable {
+    func fetchData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void)
+}
+struct NetworkManager: fetchable {
+    func fetchData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void) {
+        // URLSession.shared.dataTask 이것을 사용하고 있는데, sessionConfiguration을 사용할 필요는 없음,
         let task = URLSession.shared.dataTask(with: requestURL) { data, response, error in
             guard error == nil else {
                 return
