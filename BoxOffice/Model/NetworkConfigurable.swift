@@ -9,7 +9,7 @@ import Foundation
 
 public protocol NetworkConfigurable {
     var baseURL: String { get }
-    var queryParameters: [String: String] { get }
+    var queryParameters: [String: String]? { get }
 }
 
 extension NetworkConfigurable {
@@ -20,7 +20,7 @@ extension NetworkConfigurable {
             throw URLComponentError.components
         }
         
-        queryParameters.forEach {
+        queryParameters?.forEach {
             urlQueryItems.append(URLQueryItem(name: $0.key, value: $0.value))
         }
         
@@ -35,14 +35,14 @@ extension NetworkConfigurable {
         return requestURL
     }
     
-    public func urlGenerate(paths: [String], isFullPath: Bool) throws -> URL {
+    public func urlGenerate(paths: [String]?, isFullPath: Bool) throws -> URL {
         guard let url = URL(string: baseURL) else {
             throw URLGenerateError.convertURL
         }
         // "http://kobis.or.kr/"
         var baseURL = url.absoluteString
         
-        paths.forEach {
+        paths?.forEach {
             baseURL += $0
         }
         
@@ -52,7 +52,7 @@ extension NetworkConfigurable {
         
         var urlQueryItems: [URLQueryItem] = []
         
-        queryParameters.forEach {
+        queryParameters?.forEach {
             urlQueryItems.append(URLQueryItem(name: $0.key, value: $0.value))
         }
         

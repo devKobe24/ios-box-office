@@ -75,7 +75,7 @@ class ViewController: UIViewController {
                     "targetDt": "20230724"
                 ]
             )
-            
+
             let url = try endPoint.urlGenerate(
                 paths: [
                     "/kobisopenapi",
@@ -87,8 +87,10 @@ class ViewController: UIViewController {
                 isFullPath: false
             )
             
-            let urlRequest = URLRequest(url: url)
-            
+            let endpoint2 = EndPoint(baseURL: "http://kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json?key=f5eef3421c602c6cb7ea224104795888&targetDt=20120101")
+            let url2 = try endpoint2.urlGenerate(paths: nil, isFullPath: true)
+            let urlRequest = URLRequest(url: url2)
+
             let networkManager = NetworkManager()
             networkManager.fetchData(
                 requestURL: urlRequest) { (boxOffice: BoxOffice) in

@@ -9,5 +9,5 @@ import Foundation
 
 public struct EndPoint: NetworkConfigurable {
     public var baseURL: String
-    public var queryParameters: [String : String]
+    public var queryParameters: [String : String]?
 }
