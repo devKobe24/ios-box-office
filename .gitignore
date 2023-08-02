@@ -101,6 +101,6 @@ iOSInjectionProject/
 **/xcshareddata/WorkspaceSettings.xcsettings
 
 ### API_KEY_PLIST ###
-BoxOffice/API_KEY.plist
+
 
 # End of https://www.toptal.com/developers/gitignore/api/xcode,swift
