@@ -7,9 +7,12 @@
 
 import UIKit
 
-class ViewController: UIViewController {
+class ViewController: UIViewController, Fetchable {
+    var boxOfficeData: [BoxOffice] = []
+    var itemData: [Item] = []
     
-    var itemData: [DailyBoxOfficeList] = []
+    
+//    var itemData: [DailyBoxOfficeList] = []
     let networkManager: NetworkManager = NetworkManager()
     var dataSource: UICollectionViewDiffableDataSource<Section, DailyBoxOfficeList>? = nil
     
@@ -32,7 +35,7 @@ class ViewController: UIViewController {
     }
     
     func configureDataSource() {
-        let cellRegistration = UICollectionView.CellRegistration<CustomListCell, DailyBoxOfficeList> { (cell, indexPath, item) in
+        let cellRegistration = UICollectionView.CellRegistration<CustomListCell, Item> { (cell, indexPath, item) in
             cell.updateWithItem(item)
             cell.accessories = [.disclosureIndicator()]
         }
@@ -61,13 +64,6 @@ extension ViewController {
             )
             
             let url = try endPoint.generateURL(
-                paths: [
-                    "/kobisopenapi",
-                    "/webservice",
-                    "/rest",
-                    "/boxoffice",
-                    "/searchDailyBoxOfficeList.json"
-                ],
                 isFullPath: false
             )
             
