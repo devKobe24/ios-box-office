@@ -17,7 +17,7 @@ class ViewController: UIViewController, Fetchable {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        
+        navigationItem.title = "2023-01-05"
         
         fetchBoxOfficeData { items in
             DispatchQueue.main.async {
@@ -32,7 +32,7 @@ class ViewController: UIViewController, Fetchable {
         return UICollectionViewCompositionalLayout.list(using: config)
     }
     
-    lazy var collectionView: UICollectionView = UICollectionView(frame: view.bounds, collectionViewLayout: creatLayout())
+    lazy var collectionView: UICollectionView = UICollectionView(frame: view.frame, collectionViewLayout: creatLayout())
     
     func configureHierarchy() {
         collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
