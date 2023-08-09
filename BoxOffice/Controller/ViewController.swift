@@ -11,17 +11,21 @@ class ViewController: UIViewController, Fetchable {
     var boxOfficeData: [BoxOffice] = []
     var itemData: [Item] = []
     
+    var targetDate = "20230724"
+    
     let networkManager: NetworkManager = NetworkManager()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
+    let refreshControl = UIRefreshControl()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.title = "2023-01-05"
+        self.makeRefreshControl()
+        self.configureHierarchy()
         
         fetchBoxOfficeData { items in
             DispatchQueue.main.async {
-                self.configureHierarchy()
                 self.configureDataSource()
             }
         }
@@ -33,6 +37,11 @@ class ViewController: UIViewController, Fetchable {
     }
     
     lazy var collectionView: UICollectionView = UICollectionView(frame: view.frame, collectionViewLayout: creatLayout())
+    
+    func makeRefreshControl() {
+        collectionView.addSubview(refreshControl)
+        refreshControl.addTarget(self, action: #selector(refreshRankData(_:)), for: .valueChanged)
+    }
     
     func configureHierarchy() {
         collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
@@ -49,6 +58,28 @@ class ViewController: UIViewController, Fetchable {
         ])
     }
     
+    
+    @objc func refreshRankData(_ sender: Any) {
+        itemData = []
+        
+        fetchBoxOfficeData { [weak self] newItems in
+            guard let self = self else { return }
+            DispatchQueue.main.async {
+                self.refreshControl.beginRefreshing()
+                self.itemData = newItems
+                
+                var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+
+                snapshot.appendSections([.main])
+                snapshot.appendItems(self.itemData)
+                if let dataSource = self.dataSource {
+                    dataSource.apply(snapshot, animatingDifferences: false)
+                }
+                self.refreshControl.endRefreshing()
+            }
+        }
+        targetDate = "20230720"
+    }
     func configureDataSource() {
         let cellRegistration = UICollectionView.CellRegistration<CustomListCell, Item> { (cell, indexPath, item) in
             cell.updateWithItem(item)
@@ -74,7 +105,7 @@ extension ViewController {
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
                 queryItems: [
                     "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "20230724"
+                    "targetDt": targetDate
                 ]
             )
             
@@ -102,7 +133,7 @@ extension ViewController {
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
                 queryItems: [
                     "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "20230724"
+                    "targetDt": targetDate
                 ]
             )
             

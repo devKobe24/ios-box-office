@@ -17,6 +17,7 @@ class CustomListCell: ItemListCell {
     let rankNumberLabel = UILabel()
     let rankChangeLabel = UILabel()
     
+
     var setupViewsIfNeededFlag: Bool? = nil
 }
 
@@ -41,12 +42,12 @@ extension CustomListCell {
         
         NSLayoutConstraint.activate([
             listContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60),
-            listContentView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            listContentView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
             listContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
             listContentViewBottomConstraint,
             
             movieRankStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
-            movieRankStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            movieRankStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
             movieRankStackViewBottomConstraint
         ])
         
@@ -57,8 +58,6 @@ extension CustomListCell {
         setupViewsIfNeeded()
         
         var content = defaultListContentConfiguration().updated(for: state)
-        
-        content.axesPreservingSuperviewLayoutMargins = []
         
         content.text = state.item?.movieName
         content.textProperties.font = .preferredFont(forTextStyle: .subheadline)
