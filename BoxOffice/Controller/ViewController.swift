@@ -7,22 +7,38 @@
 
 import UIKit
 
-class ViewController: UIViewController, Fetchable {
-    var boxOfficeData: [BoxOffice] = []
+class ViewController: UIViewController {
+    var boxOfficeData: BoxOffice?
     var itemData: [Item] = []
     
     let networkManager: NetworkManager = NetworkManager()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
     
+    var countUp: Int = 20230720
+    
+    let refreshControl = UIRefreshControl()
+    
+    // MARK: - ViewDidLoad 자체가 main thread 에서 실행.
     override func viewDidLoad() {
         super.viewDidLoad()
         
         navigationItem.title = "2023-01-05"
         
+        self.configureHierarchy()
+        
         fetchBoxOfficeData { items in
             DispatchQueue.main.async {
-                self.configureHierarchy()
                 self.configureDataSource()
+            }
+        }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        fetchBoxOfficeData { _ in
+            DispatchQueue.main.async {
+                self.initRefresh()
             }
         }
     }
@@ -32,20 +48,34 @@ class ViewController: UIViewController, Fetchable {
         return UICollectionViewCompositionalLayout.list(using: config)
     }
     
-    lazy var collectionView: UICollectionView = UICollectionView(frame: view.frame, collectionViewLayout: creatLayout())
+    lazy var collectionView: UICollectionView = UICollectionView(
+        frame: view.frame,
+        collectionViewLayout: creatLayout()
+    )
     
     func configureHierarchy() {
-        collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
+        collectionView.autoresizingMask = [
+            .flexibleHeight,
+            .flexibleWidth
+        ]
         
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         
         view.addSubview(collectionView)
         
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.topAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.topAnchor
+            ),
+            collectionView.leadingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.leadingAnchor
+            ),
+            collectionView.trailingAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.trailingAnchor
+            ),
+            collectionView.bottomAnchor.constraint(
+                equalTo: view.safeAreaLayoutGuide.bottomAnchor
+            ),
         ])
     }
     
@@ -54,15 +84,35 @@ class ViewController: UIViewController, Fetchable {
             cell.updateWithItem(item)
             cell.accessories = [.disclosureIndicator()]
         }
-        dataSource = UICollectionViewDiffableDataSource<Section, Item>(collectionView: collectionView, cellProvider: { (collectionView, indexPath, itemIdentifier) -> UICollectionViewCell in
-            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: itemIdentifier)
+        dataSource = UICollectionViewDiffableDataSource<Section, Item>(collectionView: collectionView, cellProvider: { (collectionView, indexPath, item) -> UICollectionViewCell in
+            return collectionView.dequeueConfiguredReusableCell(using: cellRegistration, for: indexPath, item: item)
         })
         
         var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
         snapshot.appendSections([.main])
-        snapshot.appendItems(itemData)
+        snapshot.appendItems(Item.all)
         guard let dataSource = dataSource else { return }
-        dataSource.apply(snapshot)
+        dataSource.apply(snapshot, animatingDifferences: true)
+    }
+    
+    func initRefresh() {
+        refreshControl.addTarget(self, action: #selector(refreshCollection), for: .valueChanged)
+        
+        collectionView.refreshControl = refreshControl
+    }
+    
+    @objc func refreshCollection() {
+        self.countUp += 1
+        Item.all.removeAll()
+        fetchBoxOfficeData { _ in
+            DispatchQueue.main.async {
+                self.configureDataSource()
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                self.refreshControl.endRefreshing()
+            }
+        }
     }
 }
 
@@ -88,7 +138,6 @@ extension ViewController {
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 print(boxOffice)
             }
-            
         } catch {
             print(error.localizedDescription)
         }
@@ -97,12 +146,14 @@ extension ViewController {
 
 extension ViewController {
     func fetchBoxOfficeData(completion: @escaping ([Item]) -> ()) {
+        print("DATE =========>>> \(countUp)")
         do {
+            
             let endPoint: EndPoint = EndPoint(
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
                 queryItems: [
                     "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "20230724"
+                    "targetDt": "\(countUp)"
                 ]
             )
             
@@ -115,18 +166,23 @@ extension ViewController {
             networkManager.getBoxOfficeData(requestURL: urlRequest) { [weak self] (boxOffice: BoxOffice) in
                 guard let self = self else { return }
                 
-                self.boxOfficeData.append(boxOffice)
+                self.boxOfficeData = boxOffice
+                
+                guard let boxOfficeData = boxOfficeData else { return }
+                
                 let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
-                for index in 1...count {
-                    let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index-1].rankNumber
-                    let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index-1].rankIntensity
-                    let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index-1].movieName
-                    let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index-1].audienceCount
-                    let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index-1].audienceAccumulated
+                for index in 0...(count-1) {
+                    let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
+                    let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankIntensity
+                    let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
+                    let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
+                    let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
                     
                     let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated)
                     
-                    self.itemData.append(items)
+//                    self.itemData.append(items)
+                    
+                    Item.all.append(items)
                 }
                 completion(self.itemData)
             }
