@@ -8,8 +8,8 @@
 import UIKit
 
 class ViewController: UIViewController {
-    var boxOfficeData: BoxOffice?
-    var itemData: [Item] = []
+//    var boxOfficeData: BoxOffice?
+//    var itemData: [Item] = []
     
     let networkManager: NetworkManager = NetworkManager()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
@@ -26,7 +26,7 @@ class ViewController: UIViewController {
         
         self.configureHierarchy()
         
-        fetchBoxOfficeData { items in
+        fetchBoxOfficeData {
             DispatchQueue.main.async {
                 self.configureDataSource()
             }
@@ -36,7 +36,7 @@ class ViewController: UIViewController {
     override func viewDidAppear(_ animated: Bool) {
         super.viewDidAppear(animated)
         
-        fetchBoxOfficeData { _ in
+        fetchBoxOfficeData {
             DispatchQueue.main.async {
                 self.initRefresh()
             }
@@ -104,7 +104,7 @@ class ViewController: UIViewController {
     @objc func refreshCollection() {
         self.countUp += 1
         Item.all.removeAll()
-        fetchBoxOfficeData { _ in
+        fetchBoxOfficeData {
             DispatchQueue.main.async {
                 self.configureDataSource()
             }
@@ -145,7 +145,7 @@ extension ViewController {
 }
 
 extension ViewController {
-    func fetchBoxOfficeData(completion: @escaping ([Item]) -> ()) {
+    func fetchBoxOfficeData(completion: @escaping () -> ()) {
         print("DATE =========>>> \(countUp)")
         do {
             
@@ -163,13 +163,7 @@ extension ViewController {
             
             let urlRequest = URLRequest(url: url)
             
-            networkManager.getBoxOfficeData(requestURL: urlRequest) { [weak self] (boxOffice: BoxOffice) in
-                guard let self = self else { return }
-                
-                self.boxOfficeData = boxOffice
-                
-                guard let boxOfficeData = boxOfficeData else { return }
-                
+            networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
                 for index in 0...(count-1) {
                     let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
@@ -180,11 +174,9 @@ extension ViewController {
                     
                     let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated)
                     
-//                    self.itemData.append(items)
-                    
                     Item.all.append(items)
                 }
-                completion(self.itemData)
+                completion()
             }
         } catch {
             print(error.localizedDescription)
