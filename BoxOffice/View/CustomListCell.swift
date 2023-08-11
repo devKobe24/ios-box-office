@@ -23,8 +23,8 @@ class CustomListCell: ItemListCell {
 extension CustomListCell {
     func setupViewsIfNeeded() {
         let movieRankStackView = UIStackView(arrangedSubviews: [rankNumberLabel, rankChangeLabel])
-        movieRankStackView.alignment = .center
-        movieRankStackView.distribution = .fillProportionally
+        movieRankStackView.alignment = .fill
+        movieRankStackView.distribution = .fillEqually
         movieRankStackView.spacing = 0
         movieRankStackView.axis = .vertical
         movieRankStackView.translatesAutoresizingMaskIntoConstraints = false
@@ -46,6 +46,7 @@ extension CustomListCell {
             listContentViewBottomConstraint,
             
             movieRankStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
+            movieRankStackView.widthAnchor.constraint(equalToConstant: 40),
             movieRankStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
             movieRankStackViewBottomConstraint
         ])
@@ -63,9 +64,26 @@ extension CustomListCell {
         content.text = state.item?.movieName
         content.textProperties.font = .preferredFont(forTextStyle: .subheadline)
         content.secondaryText = "오늘 \(state.item?.audienceCount ?? "오류") / 총 \(state.item?.audienceAccumulated ?? "오류")"
-        
         rankNumberLabel.text = state.item?.rankNumber
-        rankChangeLabel.text = state.item?.rankIntensity
+        
+        guard var isNewMovie = state.item?.rankOldAndNew else { return }
+        var rankChangeLabelText: String {
+            switch isNewMovie {
+            case "NEW":
+                return "신작"
+            case "OLD":
+                return "기존"
+            default:
+                return "에러"
+            }
+        }
+        if isNewMovie == "NEW" {
+            rankChangeLabel.text = rankChangeLabelText
+        } else if isNewMovie == "OLD" {
+            rankChangeLabel.text = state.item?.rankIntensity
+        }
+        
+        
         rankNumberLabel.font = .preferredFont(forTextStyle: .title1)
         listContentView.configuration = content
     }

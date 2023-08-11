@@ -8,7 +8,7 @@
 import UIKit
 
 class ViewController: UIViewController {
-    var dateCountUpForTest: Int = 20230720
+    var dateCountUpForTest: Int = 20230809
     let networkManager: NetworkManager = NetworkManager()
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
@@ -102,7 +102,7 @@ extension ViewController {
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
                 queryItems: [
                     "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "\(date)"
+                    "targetDt": "\(dateCountUpForTest)"
                 ]
             )
             
@@ -118,8 +118,9 @@ extension ViewController {
                     let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
                     let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
                     let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
+                    let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
                     
-                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated)
+                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew)
                     
                     Item.all.append(items)
                 }
