@@ -22,13 +22,21 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        navigationItem.title = "2023-01-05"
-        
         self.configureHierarchy()
         
         fetchBoxOfficeData {
             DispatchQueue.main.async {
+                self.setupNavigationTitle()
                 self.configureDataSource()
+            }
+        }
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        fetchBoxOfficeData {
+            DispatchQueue.main.async {
+//                self.setupNavigationTitle()
             }
         }
     }
@@ -37,6 +45,7 @@ class ViewController: UIViewController {
         super.viewDidAppear(animated)
         
         fetchBoxOfficeData {
+            // 븨븨 피셜 -> 엑티비티 인디케이터는 main thread에서
             DispatchQueue.main.async {
                 self.initRefresh()
             }
@@ -181,5 +190,11 @@ extension ViewController {
         } catch {
             print(error.localizedDescription)
         }
+    }
+}
+
+extension ViewController: FetchDateble {
+    private func setupNavigationTitle() {
+        navigationItem.title = fetchDate()
     }
 }
