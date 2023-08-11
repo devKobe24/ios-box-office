@@ -8,46 +8,21 @@
 import UIKit
 
 class ViewController: UIViewController {
-//    var boxOfficeData: BoxOffice?
-//    var itemData: [Item] = []
-    
+    var dateCountUpForTest: Int = 20230720
     let networkManager: NetworkManager = NetworkManager()
+    let refreshControl: UIRefreshControl = UIRefreshControl()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
     
-    var countUp: Int = 20230720
-    
-    let refreshControl = UIRefreshControl()
-    
-    // MARK: - ViewDidLoad 자체가 main thread 에서 실행.
     override func viewDidLoad() {
         super.viewDidLoad()
         
         self.configureHierarchy()
+        self.initRefreshControl()
         
         fetchBoxOfficeData {
             DispatchQueue.main.async {
-                self.setupNavigationTitle()
                 self.configureDataSource()
-            }
-        }
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        fetchBoxOfficeData {
-            DispatchQueue.main.async {
-//                self.setupNavigationTitle()
-            }
-        }
-    }
-    
-    override func viewDidAppear(_ animated: Bool) {
-        super.viewDidAppear(animated)
-        
-        fetchBoxOfficeData {
-            // 븨븨 피셜 -> 엑티비티 인디케이터는 main thread에서
-            DispatchQueue.main.async {
-                self.initRefresh()
+                self.setupNavigationTitle()
             }
         }
     }
@@ -57,34 +32,17 @@ class ViewController: UIViewController {
         return UICollectionViewCompositionalLayout.list(using: config)
     }
     
-    lazy var collectionView: UICollectionView = UICollectionView(
-        frame: view.frame,
-        collectionViewLayout: creatLayout()
-    )
+    lazy var collectionView: UICollectionView = UICollectionView(frame: view.bounds, collectionViewLayout: creatLayout())
     
     func configureHierarchy() {
-        collectionView.autoresizingMask = [
-            .flexibleHeight,
-            .flexibleWidth
-        ]
-        
+        collectionView.autoresizingMask = [.flexibleHeight, .flexibleWidth]
         collectionView.translatesAutoresizingMaskIntoConstraints = false
-        
         view.addSubview(collectionView)
-        
         NSLayoutConstraint.activate([
-            collectionView.topAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.topAnchor
-            ),
-            collectionView.leadingAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.leadingAnchor
-            ),
-            collectionView.trailingAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.trailingAnchor
-            ),
-            collectionView.bottomAnchor.constraint(
-                equalTo: view.safeAreaLayoutGuide.bottomAnchor
-            ),
+            collectionView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            collectionView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            collectionView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
+            collectionView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor)
         ])
     }
     
@@ -101,27 +59,7 @@ class ViewController: UIViewController {
         snapshot.appendSections([.main])
         snapshot.appendItems(Item.all)
         guard let dataSource = dataSource else { return }
-        dataSource.apply(snapshot, animatingDifferences: true)
-    }
-    
-    func initRefresh() {
-        refreshControl.addTarget(self, action: #selector(refreshCollection), for: .valueChanged)
-        
-        collectionView.refreshControl = refreshControl
-    }
-    
-    @objc func refreshCollection() {
-        self.countUp += 1
-        Item.all.removeAll()
-        fetchBoxOfficeData {
-            DispatchQueue.main.async {
-                self.configureDataSource()
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                self.refreshControl.endRefreshing()
-            }
-        }
+        dataSource.apply(snapshot)
     }
 }
 
@@ -137,9 +75,7 @@ extension ViewController {
                 ]
             )
             
-            let url = try endPoint.generateURL(
-                isFullPath: false
-            )
+            let url = try endPoint.generateURL(isFullPath: false)
             
             let urlRequest = URLRequest(url: url)
             
@@ -147,6 +83,7 @@ extension ViewController {
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 print(boxOffice)
             }
+            
         } catch {
             print(error.localizedDescription)
         }
@@ -155,23 +92,24 @@ extension ViewController {
 
 extension ViewController {
     func fetchBoxOfficeData(completion: @escaping () -> ()) {
-        print("DATE =========>>> \(countUp)")
+        
+        
         do {
+            let date = try fetchDateForTargetDt()
+            print("date ============>>>>>>>>>> \(date)")
             
-            let endPoint: EndPoint = EndPoint(
+            let endPoint = EndPoint(
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
                 queryItems: [
                     "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "\(countUp)"
+                    "targetDt": "\(date)"
                 ]
             )
             
-            let url = try endPoint.generateURL(
-                isFullPath: false
-            )
+            let url = try endPoint.generateURL(isFullPath: false)
             
             let urlRequest = URLRequest(url: url)
-            
+    
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
                 for index in 0...(count-1) {
@@ -189,6 +127,29 @@ extension ViewController {
             }
         } catch {
             print(error.localizedDescription)
+        }
+    }
+}
+
+extension ViewController {
+    private func initRefreshControl() {
+        refreshControl.addTarget(self, action: #selector(pullRefreshControl), for: .valueChanged)
+        collectionView.refreshControl = refreshControl
+    }
+    
+    @objc func pullRefreshControl() {
+        self.dateCountUpForTest += 1
+        Item.all.removeAll()
+        fetchBoxOfficeData {
+            DispatchQueue.main.async {
+                var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+                snapshot.appendSections([.main])
+                snapshot.appendItems(Item.all)
+                guard let dataSource = self.dataSource else { return }
+                dataSource.apply(snapshot)
+                
+                self.refreshControl.endRefreshing()
+            }
         }
     }
 }
