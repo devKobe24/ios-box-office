@@ -64,22 +64,12 @@ extension CustomListCell {
         content.text = state.item?.movieName
         content.textProperties.font = .preferredFont(forTextStyle: .subheadline)
         content.secondaryText = "오늘 \(state.item?.audienceCount ?? "오류") / 총 \(state.item?.audienceAccumulated ?? "오류")"
+        
         rankNumberLabel.text = state.item?.rankNumber
+        rankNumberLabel.font = .preferredFont(forTextStyle: .title1)
         
         guard let isNewMovie = state.item?.rankOldAndNew else { return }
-        guard var rankIntensity = state.item?.rankIntensity else { return }
-        
-        var rankIntensityText: String {
-            if rankIntensity.contains("-") {
-                rankIntensity = rankIntensity.replacingOccurrences(of: "-", with: "▼")
-                return rankIntensity
-            } else if rankIntensity.contains("0") {
-                rankIntensity = rankIntensity.replacingOccurrences(of: "0", with: "-")
-                return rankIntensity
-            }
-            rankIntensity = rankIntensity.replacingOccurrences(of: rankIntensity, with: "▲\(rankIntensity)")
-            return rankIntensity
-        }
+        guard let rankIntensity = state.item?.rankIntensity else { return }
         
         var rankChangeLabelText: String {
             switch isNewMovie {
@@ -92,106 +82,61 @@ extension CustomListCell {
             }
         }
         
-//        var rankIntensityOperation: NSAttributedString? {
-//            guard let rankIntensity = rankIntensity else { return nil }
-//            if rankIntensity.contains("-") {
-//                return makeRankIntensity(rankIntensityData: rankIntensity, rankIntensityState: .down)
-//            } else if rankIntensity.contains("0") {
-//                return makeRankIntensity(rankIntensityData: rankIntensity, rankIntensityState: .stay)
-//            }
-//            return makeRankIntensity(rankIntensityData: rankIntensity, rankIntensityState: .up)
-//        }
         
         if isNewMovie == "NEW" {
-            rankChangeLabel.text = rankChangeLabelText
+            rankChangeLabel.text = "신작"
+            rankChangeLabel.font = UIFont.systemFont(ofSize: 17.0)
+            rankChangeLabel.textColor = .red
         } else if isNewMovie == "OLD" {
-//            rankChangeLabel.text = rankIntensityText
-//            guard let rankIntensityOperation = rankIntensityOperation else { return }
-            rankChangeLabel.text = rankIntensityText
+            makeRankIntensity(rankIntensityData: rankIntensity) { [weak self] rankIntensity in
+                self?
+                    .rankChangeLabel.attributedText = rankIntensity
+            }
         }
         
         
-        rankNumberLabel.font = .preferredFont(forTextStyle: .title1)
+        
         listContentView.configuration = content
     }
 }
 
 extension CustomListCell {
-    func makeRankIntensity(rankIntensityData: String?, rankIntensityState: RankIntensityCategory) -> NSAttributedString? {
+    func makeRankIntensity(rankIntensityData: String?, completion: @escaping (NSAttributedString) -> ()?) {
         // MARK: - 공통 사용 변수, 상수
-        guard var rankIntensity = rankIntensityData else { return nil }
+        guard var rankIntensity = rankIntensityData else { return }
         let font = UIFont.systemFont(ofSize: 17.0)
         
-        // MARK: - downRankIntensity
-        var downRankIntensity: String? {
-            if rankIntensity.contains("-") {
-                rankIntensity = rankIntensity.replacingOccurrences(of: "-", with: "▼")
-                return rankIntensity
-            }
-            return nil
-        }
-        
-        let downRankIntensityAttributes = [
-            NSAttributedString.Key.foregroundColor: UIColor.red,
-            NSAttributedString.Key.font: font as Any
-        ] as [NSAttributedString.Key: Any]
-        
-        guard let downRankIntensity = downRankIntensity else { return nil }
-        
-        let attributeDownRankIntesity = NSMutableAttributedString(string: downRankIntensity)
-        attributeDownRankIntesity.addAttribute(
-            .foregroundColor,
-            value: UIColor.blue,
-            range: (downRankIntensity as NSString).range(of: "▼")
-        )
-        
-        // MARK: - upRankIntensity
-        var upRankIntensity: String? {
-            rankIntensity = rankIntensity.replacingOccurrences(of: rankIntensity, with: "▲" + "\(rankIntensity)")
-            return rankIntensity
-        }
-        
-        let upRankIntensityAttributes = [
-            NSAttributedString.Key.foregroundColor: UIColor.red,
-            NSAttributedString.Key.font: font as Any
-        ] as [NSAttributedString.Key: Any]
-        
-        guard let upRankIntensity = upRankIntensity else { return nil }
-        
-        let attributeUpRankIntesity = NSMutableAttributedString(string: upRankIntensity)
-        attributeUpRankIntesity.addAttribute(
-            .foregroundColor,
-            value: UIColor.red,
-            range: (upRankIntensity as NSString).range(of: "▲")
-        )
-
-        // MARK: - stayRankIntensity
-        var stayRankIntensity: String? {
+        if rankIntensity.contains("-") {
+            rankIntensity = rankIntensity.replacingOccurrences(of: "-", with: "▼")
+            
+            let attributeDownRankIntesity = NSMutableAttributedString(string: rankIntensity)
+            attributeDownRankIntesity.addAttributes([
+                NSMutableAttributedString.Key.foregroundColor: UIColor.blue,
+                NSMutableAttributedString.Key.font: font as Any
+            ], range: (rankIntensity as NSString).range(of: "▼"))
+            
+            completion(attributeDownRankIntesity)
+        } else if rankIntensity.contains("0") {
             rankIntensity = rankIntensity.replacingOccurrences(of: "0", with: "-")
-            return rankIntensity
-        }
-        
-        let stayRankIntensityAttributes = [
-            NSAttributedString.Key.foregroundColor: UIColor.red,
-            NSAttributedString.Key.font: font as Any
-        ] as [NSAttributedString.Key: Any]
-        
-        guard let stayRankIntensity = stayRankIntensity else { return nil }
-        
-        let attributeStayRankIntesity = NSMutableAttributedString(string: stayRankIntensity)
-        attributeStayRankIntesity.addAttribute(
-            .foregroundColor,
-            value: UIColor.red,
-            range: (stayRankIntensity as NSString).range(of: "-")
-        )
-        
-        switch rankIntensityState {
-        case .down:
-            return attributeDownRankIntesity
-        case .up:
-            return attributeUpRankIntesity
-        case .stay:
-            return attributeStayRankIntesity
+            
+            let attributeStayRankIntesity = NSMutableAttributedString(string: rankIntensity)
+            attributeStayRankIntesity.addAttribute(
+                .foregroundColor,
+                value: UIColor.black,
+                range: (rankIntensity as NSString).range(of: "-")
+            )
+            
+            completion(attributeStayRankIntesity)
+        } else {
+            rankIntensity = rankIntensity.replacingOccurrences(of: rankIntensity, with: "▲\(rankIntensity)")
+            
+            let attributeUpRankIntesity = NSMutableAttributedString(string: rankIntensity)
+            attributeUpRankIntesity.addAttributes([
+                NSMutableAttributedString.Key.foregroundColor: UIColor.red,
+                NSMutableAttributedString.Key.font: font as Any
+            ], range: (rankIntensity as NSString).range(of: "▲"))
+            
+            completion(attributeUpRankIntesity)
         }
     }
 }
