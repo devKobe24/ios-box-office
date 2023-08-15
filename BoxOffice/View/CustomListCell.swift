@@ -14,8 +14,18 @@ class CustomListCell: ItemListCell {
     
     private lazy var listContentView = UIListContentView(configuration: defaultContentConfiguration())
     
-    let rankNumberLabel = UILabel()
-    let rankChangeLabel = UILabel()
+    let rankNumberLabel: UILabel = {
+        let rankNumberLabel: UILabel = UILabel()
+        rankNumberLabel.adjustsFontForContentSizeCategory = true
+        rankNumberLabel.numberOfLines = 0
+        return rankNumberLabel
+    }()
+    let rankChangeLabel: UILabel = {
+        let rankChangeLabel: UILabel = UILabel()
+        rankChangeLabel.adjustsFontForContentSizeCategory = true
+        rankChangeLabel.numberOfLines = 0
+        return rankChangeLabel
+    }()
     
     var setupViewsIfNeededFlag: Bool? = nil
 }
@@ -62,7 +72,7 @@ extension CustomListCell {
         
         guard let isNewMovie = state.item?.rankOldAndNew else { return }
         guard let rankIntensity = state.item?.rankIntensity else { return }
-                
+        
         if isNewMovie == "NEW" {
             makeOldAndNewMovieCategory(isNewMovie: isNewMovie) { [weak self] oldAndNewMovieTitle in
                 self?.rankChangeLabel.attributedText = oldAndNewMovieTitle
@@ -80,7 +90,8 @@ extension CustomListCell {
 extension CustomListCell {
     func makeRankIntensity(rankIntensityData: String?, completion: @escaping (NSAttributedString) -> Void?) {
         guard var rankIntensityData = rankIntensityData else { return }
-        let font = UIFont.systemFont(ofSize: 17.0)
+        guard var rankIntensityDataForClassification = Int(rankIntensityData) else { return }
+        let font = UIFont.preferredFont(forTextStyle: .caption1)
         
         if rankIntensityData.contains("-") {
             rankIntensityData = rankIntensityData.replacingOccurrences(of: "-", with: "▼")
@@ -88,11 +99,16 @@ extension CustomListCell {
             let attributeDownRankIntensity = NSMutableAttributedString(string: rankIntensityData)
             attributeDownRankIntensity.addAttributes([
                 NSMutableAttributedString.Key.foregroundColor: UIColor.blue,
-                NSMutableAttributedString.Key.font: font as Any
+                
             ], range: (rankIntensityData as NSString).range(of: "▼"))
+            
+            attributeDownRankIntensity.addAttributes([
+                NSMutableAttributedString.Key.font: font as Any
+            ], range: (rankIntensityData as NSString).range(of: rankIntensityData))
             
             completion(attributeDownRankIntensity)
         } else if rankIntensityData.contains("0") {
+            
             rankIntensityData = rankIntensityData.replacingOccurrences(of: "0", with: "-")
             
             let attributeStayRankIntensity = NSMutableAttributedString(string: rankIntensityData)
@@ -102,18 +118,28 @@ extension CustomListCell {
                 range: (rankIntensityData as NSString).range(of: "-")
             )
             
+            attributeStayRankIntensity.addAttributes([
+                NSMutableAttributedString.Key.font: font as Any
+            ], range: (rankIntensityData as NSString).range(of: rankIntensityData))
+            
             completion(attributeStayRankIntensity)
-        } else {
+        } else if rankIntensityDataForClassification > 0 {
+            
             rankIntensityData = rankIntensityData.replacingOccurrences(of: rankIntensityData, with: "▲" + "\(rankIntensityData)")
             
             let attributeUpRankIntensity = NSMutableAttributedString(string: rankIntensityData)
             attributeUpRankIntensity.addAttributes([
-                NSMutableAttributedString.Key.foregroundColor: UIColor.red,
-                NSMutableAttributedString.Key.font: font as Any
+                NSMutableAttributedString.Key.foregroundColor: UIColor.red
             ], range: (rankIntensityData as NSString).range(of: "▲"))
+            
+            attributeUpRankIntensity.addAttributes([
+                NSMutableAttributedString.Key.font: font as Any
+            ], range: (rankIntensityData as NSString).range(of: rankIntensityData))
             
             completion(attributeUpRankIntensity)
         }
+        
+        
     }
 }
 
@@ -130,7 +156,7 @@ extension CustomListCell {
             }
         }
         
-        let font = UIFont.systemFont(ofSize: 17.0)
+        let font = UIFont.preferredFont(forTextStyle: .caption1)
         
         if oldAndNewMovieCategory == "신작" {
             let attributeOldAndNewMovieCategory = NSMutableAttributedString(string: oldAndNewMovieCategory)
