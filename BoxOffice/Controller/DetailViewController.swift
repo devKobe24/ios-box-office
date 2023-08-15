@@ -8,6 +8,8 @@
 import UIKit
 
 class DetailViewController: UIViewController {
+    var movieTitle: String?
+    
     let scrollView: UIScrollView = {
         let scrollView: UIScrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
@@ -20,8 +22,8 @@ class DetailViewController: UIViewController {
         return contentView
     }()
     
-    let movieImageView: UIImageView = {
-        let movieImageView: UIImageView = UIImageView()
+    var movieImageView: UIImageView = {
+        var movieImageView: UIImageView = UIImageView()
         movieImageView.translatesAutoresizingMaskIntoConstraints = false
         return movieImageView
     }()
@@ -29,34 +31,46 @@ class DetailViewController: UIViewController {
     let networkManager: NetworkManager = NetworkManager()
     var queryParameters: [String: String] = [:]
     
+    init(movieTitle: String? = nil) {
+        self.movieTitle = movieTitle
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
-        //    headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"],
+        
         addSubViews()
         setUpScrollViewConstraints()
         setUpContentViewConstraints()
         setUpMovieImageViewContraints()
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
         
+        guard let movieTitle = movieTitle else { return }
         fetchMoviePoster(
             networkManager: networkManager,
             headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"],
-            queryParameters: ["query": "특송+영화포스터"]
+            queryParameters: ["query": "\(movieTitle)+포스터"]
         ) { imgUrl in
             guard let url = URL(string: imgUrl) else { return }
             do {
-                let data = try Data(contentsOf: url)
-                guard let moviePoster = UIImage(data: data) else { return }
-                DispatchQueue.main.async {
-                    self.movieImageView.image = moviePoster
+                let data: Data = try Data(contentsOf: url)
+                DispatchQueue.main.async { [weak self] in
+                    guard let moviePoster = UIImage(data: data) else { return }
+                    self?.movieImageView.image = moviePoster
                 }
             } catch {
                 print(error.localizedDescription)
             }
         }
-        
     }
-    
 }
 
 extension DetailViewController {
@@ -118,6 +132,4 @@ extension DetailViewController: Fetchable, NetworkConfigurable {
             return self.queryParameters = newValue
         }
     }
-    
-    
 }

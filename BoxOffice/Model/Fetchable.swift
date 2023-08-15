@@ -52,7 +52,8 @@ extension Fetchable {
 }
 
 extension Fetchable {
-    func fetchMoviePoster(networkManager: NetworkManager, headers: [String: String] ,queryParameters: [String: String], completion: @escaping (String) -> ()) {
+    func fetchMoviePoster(networkManager: NetworkManager, headers: [String: String] ,queryParameters: [String: String]? = nil, completion: @escaping (String) -> ()) {
+        guard let queryParameters = queryParameters else { return }
         queryParameters.forEach { [weak self] (key, value) in
             self?.queryItems = [key: value]
         }
@@ -69,18 +70,14 @@ extension Fetchable {
             let urlRequest = try generateURLRequest(config: config)
             
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
-                let count = moviePoster.documents.count
-                for index in 0...(count-1) {
-                    let moviePostersURLs = moviePoster.documents[index].imageUrl
-                    
-                    MoviePoster.moviePosterImageURLs.append(MoviePoster(imageUrl: moviePostersURLs))
-                    
-                }
-                guard let moviePoster = MoviePoster.moviePosterImageURLs[0].imageUrl else { return }
-                completion(moviePoster)
+                let moviePostersURLs = moviePoster.documents[0].imageUrl
+                guard let moviePosterUrl = MoviePoster(imageUrl: moviePostersURLs).imageUrl else { return }
+                completion(moviePosterUrl)
             }
         } catch {
             print(error.localizedDescription)
         }
     }
 }
+
+

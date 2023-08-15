@@ -182,18 +182,6 @@ extension ViewController {
                 self.refreshControl.endRefreshing()
             }
         }
-        
-//        fetchBoxOfficeData {
-//            DispatchQueue.main.async {
-//                var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
-//                snapshot.appendSections([.main])
-//                snapshot.appendItems(Item.all)
-//                guard let dataSource = self.dataSource else { return }
-//                dataSource.apply(snapshot)
-//                
-//                self.refreshControl.endRefreshing()
-//            }
-//        }
     }
 }
 
@@ -209,7 +197,12 @@ extension ViewController {
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailViewController = DetailViewController()
+        
+        let movieName = Item.all.compactMap { $0.movieName }
+        let selectedMovieName = movieName[indexPath.row]
+        
+        
+        let detailViewController = DetailViewController(movieTitle: selectedMovieName)
         navigationController?.pushViewController(detailViewController, animated: true)
     }
 }
