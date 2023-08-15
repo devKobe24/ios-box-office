@@ -5,21 +5,23 @@
 //  Created by Minseong Kang on 2023/08/15.
 //
 
-protocol Fetchable {
-    var baseULR: String { get set }
-    var queryItems: [String: String] { get set }
-    func fetchBoxOfficeData(completion: @escaping () -> ())
+import Foundation
+
+protocol Fetchable: AnyObject, NetworkConfigurable {
+//    func fetchBoxOfficeData(networkManager: NetworkManager, queryParameters: [String: String], completion: @escaping () -> ())
 }
 
 extension Fetchable {
-    func fetchBoxOfficeData(completion: @escaping () -> ()) {
+    func fetchBoxOfficeData(networkManager: NetworkManager, queryParameters: [String: String], completion: @escaping () -> ()) {
+        
+        queryParameters.forEach { [weak self] (key, value) in
+            self?.queryItems = [key: value]
+        }
+        
         do {
             let endPoint = EndPoint(
-                baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-                queryItems: [
-                    "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "\(dateCountUpForTest)"
-                ]
+                baseURL: baseURL,
+                queryItems: queryParameters
             )
             
             let url = try endPoint.generateURL(isFullPath: false)

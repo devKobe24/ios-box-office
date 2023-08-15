@@ -9,7 +9,7 @@ import Foundation
 
 public protocol NetworkConfigurable {
     var baseURL: String { get }
-    var queryItems: [String: String]? { get }
+    var queryItems: [String: String]? { get set }
 }
 
 extension NetworkConfigurable {

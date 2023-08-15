@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     let networkManager: NetworkManager = NetworkManager()
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
+    var queryParameters: [String: String] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +22,13 @@ class ViewController: UIViewController {
         self.fetchDate()
         self.configureHierarchy()
         self.initRefreshControl()
-        
-        fetchBoxOfficeData {
+        self.fetchBoxOfficeData(
+            networkManager: networkManager,
+            queryParameters: [
+            "key": Bundle.main.API,
+            "targetDt": "\(dateCountUpForTest)"
+        ])
+        {
             DispatchQueue.main.async {
                 self.configureDataSource()
             }
@@ -92,41 +98,56 @@ extension ViewController {
     }
 }
 
-extension ViewController {
-    func fetchBoxOfficeData(completion: @escaping () -> ()) {
-        do {
-            let endPoint = EndPoint(
-                baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
-                queryItems: [
-                    "key": "d4bb1f8d42a3b440bb739e9d49729660",
-                    "targetDt": "\(dateCountUpForTest)"
-                ]
-            )
-            
-            let url = try endPoint.generateURL(isFullPath: false)
-            
-            let urlRequest = URLRequest(url: url)
+extension ViewController: NetworkConfigurable, Fetchable {
+    var baseURL: String {
+        return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
+    }
     
-            networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
-                let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
-                for index in 0...(count-1) {
-                    let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
-                    let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankIntensity
-                    let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
-                    let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
-                    let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
-                    let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
-                    
-                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew)
-                    
-                    Item.all.append(items)
-                }
-                completion()
-            }
-        } catch {
-            print(error.localizedDescription)
+    var queryItems: [String : String]? {
+        get {
+            return self.queryParameters
+        }
+        set {
+            guard let newValue = newValue else { return }
+            self.queryParameters = newValue
         }
     }
+    
+    
+//    func fetchBoxOfficeData(completion: @escaping () -> ()) {
+//        do {
+//            let endPoint = EndPoint(
+//                baseURL: baseURL,
+//                queryItems: [
+//                    "key": "d4bb1f8d42a3b440bb739e9d49729660",
+//                    "targetDt": "\(dateCountUpForTest)"
+//                ]
+//            )
+//
+//            let url = try endPoint.generateURL(isFullPath: false)
+//
+//            let urlRequest = URLRequest(url: url)
+//
+//            networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
+//                let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
+//                for index in 0...(count-1) {
+//                    let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
+//                    let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankIntensity
+//                    let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
+//                    let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
+//                    let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
+//                    let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
+//
+//                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew)
+//
+//                    Item.all.append(items)
+//                }
+//                completion()
+//            }
+//        } catch {
+//            print(error.localizedDescription)
+//        }
+//    }
 }
 
 extension ViewController {
@@ -138,7 +159,14 @@ extension ViewController {
     @objc func pullRefreshControl() {
         self.dateCountUpForTest += 1
         Item.all.removeAll()
-        fetchBoxOfficeData {
+        
+        self.fetchBoxOfficeData(
+            networkManager: networkManager,
+            queryParameters: [
+            "key": Bundle.main.API,
+            "targetDt": "\(dateCountUpForTest)"
+        ])
+        {
             DispatchQueue.main.async {
                 var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
                 snapshot.appendSections([.main])
@@ -149,6 +177,18 @@ extension ViewController {
                 self.refreshControl.endRefreshing()
             }
         }
+        
+//        fetchBoxOfficeData {
+//            DispatchQueue.main.async {
+//                var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+//                snapshot.appendSections([.main])
+//                snapshot.appendItems(Item.all)
+//                guard let dataSource = self.dataSource else { return }
+//                dataSource.apply(snapshot)
+//                
+//                self.refreshControl.endRefreshing()
+//            }
+//        }
     }
 }
 
