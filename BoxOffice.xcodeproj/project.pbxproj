@@ -29,6 +29,7 @@
 		BAA6E4962A6F5724000569E2 /* BoxOffice.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6E4952A6F5724000569E2 /* BoxOffice.swift */; };
 		BAA6E4AF2A6F8F6B000569E2 /* BoxOfficeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6E4AE2A6F8F6B000569E2 /* BoxOfficeTests.swift */; };
 		BAB7E7A62A8864C60023C4A6 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB7E7A52A8864C60023C4A6 /* DetailViewController.swift */; };
+		BAB9B0632A8B01BF00EB9815 /* Fetchable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB9B0622A8B01BF00EB9815 /* Fetchable.swift */; };
 		BAF0908A2A7F2E550091C1B7 /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF090892A7F2E550091C1B7 /* Section.swift */; };
 		BAF0908C2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF0908B2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift */; };
 		BAF0908E2A7F325F0091C1B7 /* UICellConfigurationState+.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF0908D2A7F325F0091C1B7 /* UICellConfigurationState+.swift */; };
@@ -71,6 +72,7 @@
 		BAA6E4AE2A6F8F6B000569E2 /* BoxOfficeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxOfficeTests.swift; sourceTree = "<group>"; };
 		BAA6E4B52A6F8F79000569E2 /* BoxOfficeTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = BoxOfficeTestPlan.xctestplan; sourceTree = "<group>"; };
 		BAB7E7A52A8864C60023C4A6 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		BAB9B0622A8B01BF00EB9815 /* Fetchable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Fetchable.swift; sourceTree = "<group>"; };
 		BAF090892A7F2E550091C1B7 /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 		BAF0908B2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIConfigurationStateCustomKey+.swift"; sourceTree = "<group>"; };
 		BAF0908D2A7F325F0091C1B7 /* UICellConfigurationState+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICellConfigurationState+.swift"; sourceTree = "<group>"; };
@@ -188,6 +190,7 @@
 				0A9681042A7899A300B78C61 /* EndPoint.swift */,
 				BAF090892A7F2E550091C1B7 /* Section.swift */,
 				0A96815B2A84EE7700B78C61 /* Item.swift */,
+				BAB9B0622A8B01BF00EB9815 /* Fetchable.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -309,6 +312,7 @@
 				BAF0908E2A7F325F0091C1B7 /* UICellConfigurationState+.swift in Sources */,
 				BA2AFE0F2A789593006C852C /* NetworkConfigurable.swift in Sources */,
 				BA527B142A87674400380A49 /* String+.swift in Sources */,
+				BAB9B0632A8B01BF00EB9815 /* Fetchable.swift in Sources */,
 				0A9681012A73954C00B78C61 /* URLRequestError.swift in Sources */,
 				BAB7E7A62A8864C60023C4A6 /* DetailViewController.swift in Sources */,
 				0A9681052A7899A300B78C61 /* EndPoint.swift in Sources */,
