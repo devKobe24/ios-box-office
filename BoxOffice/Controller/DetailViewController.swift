@@ -25,17 +25,38 @@ class DetailViewController: UIViewController {
         movieImageView.translatesAutoresizingMaskIntoConstraints = false
         return movieImageView
     }()
-
+    
+    let networkManager: NetworkManager = NetworkManager()
+    var queryParameters: [String: String] = [:]
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
-        
+        //    headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"],
         addSubViews()
         setUpScrollViewConstraints()
         setUpContentViewConstraints()
         setUpMovieImageViewContraints()
+        
+        fetchMoviePoster(
+            networkManager: networkManager,
+            headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"],
+            queryParameters: ["query": "특송+영화포스터"]
+        ) { imgUrl in
+            guard let url = URL(string: imgUrl) else { return }
+            do {
+                let data = try Data(contentsOf: url)
+                guard let moviePoster = UIImage(data: data) else { return }
+                DispatchQueue.main.async {
+                    self.movieImageView.image = moviePoster
+                }
+            } catch {
+                print(error.localizedDescription)
+            }
+        }
+        
     }
-
+    
 }
 
 extension DetailViewController {
@@ -77,4 +98,26 @@ extension DetailViewController {
         ])
         
     }
+}
+
+extension DetailViewController: Fetchable, NetworkConfigurable {
+    var headerParameters: [String : String] {
+        ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"]
+    }
+    
+    var baseURL: String {
+        "https://dapi.kakao.com/v2/search/image?"
+    }
+    
+    var queryItems: [String : String]? {
+        get {
+            return self.queryParameters
+        }
+        set {
+            guard let newValue = newValue else { return }
+            return self.queryParameters = newValue
+        }
+    }
+    
+    
 }

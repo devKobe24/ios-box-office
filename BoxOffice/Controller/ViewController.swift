@@ -76,6 +76,7 @@ extension ViewController {
         do {
             
             let endPoint = EndPoint(
+                headerParameters: [:],
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json",
                 queryItems: [
                     "key": "d4bb1f8d42a3b440bb739e9d49729660",
@@ -99,6 +100,10 @@ extension ViewController {
 }
 
 extension ViewController: NetworkConfigurable, Fetchable {
+    var headerParameters: [String : String] {
+        [:]
+    }
+    
     var baseURL: String {
         return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
     }

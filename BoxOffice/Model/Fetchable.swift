@@ -20,6 +20,7 @@ extension Fetchable {
         
         do {
             let endPoint = EndPoint(
+                headerParameters: [:],
                 baseURL: baseURL,
                 queryItems: queryParameters
             )
@@ -43,6 +44,40 @@ extension Fetchable {
                     Item.all.append(items)
                 }
                 completion()
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
+    }
+}
+
+extension Fetchable {
+    func fetchMoviePoster(networkManager: NetworkManager, headers: [String: String] ,queryParameters: [String: String], completion: @escaping (String) -> ()) {
+        queryParameters.forEach { [weak self] (key, value) in
+            self?.queryItems = [key: value]
+        }
+        
+        do {
+            let endPoint = EndPoint(
+                headerParameters: headers,
+                baseURL: baseURL,
+                queryItems: queryParameters
+            )
+            
+            let url = try endPoint.generateURL(isFullPath: false)
+            let config = ApiDataNetWorkConfig(baseURL: url, headers: headers, queryParameters: queryParameters)
+            let urlRequest = try generateURLRequest(config: config)
+            
+            networkManager.getBoxOfficeData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
+                let count = moviePoster.documents.count
+                for index in 0...(count-1) {
+                    let moviePostersURLs = moviePoster.documents[index].imageUrl
+                    
+                    MoviePoster.moviePosterImageURLs.append(MoviePoster(imageUrl: moviePostersURLs))
+                    
+                }
+                guard let moviePoster = MoviePoster.moviePosterImageURLs[0].imageUrl else { return }
+                completion(moviePoster)
             }
         } catch {
             print(error.localizedDescription)
