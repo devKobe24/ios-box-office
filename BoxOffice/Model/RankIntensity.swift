@@ -54,14 +54,17 @@ enum RankIntensity {
                 .font: font
             ], range: NSRange(location: 0, length: attributedString.length))
             
-            numberAttributedString = NSMutableAttributedString(string: "\(value)")
-            numberAttributedString.addAttributes([
-                .foregroundColor: UIColor.black,
-                .font: font
-            ], range: NSRange(location: 0, length: numberAttributedString.length))
-            
-            returnAttributedString.append(attributedString)
-            returnAttributedString.append(numberAttributedString)
+            let valueStr = String(value)
+            if let numberOnly = valueStr.last {
+                numberAttributedString = NSMutableAttributedString(string: "\(numberOnly)")
+                numberAttributedString.addAttributes([
+                    .foregroundColor: UIColor.black,
+                    .font: font
+                ], range: NSRange(location: 0, length: numberAttributedString.length))
+                
+                returnAttributedString.append(attributedString)
+                returnAttributedString.append(numberAttributedString)
+            }
             
         case .stay:
             attributedString = NSMutableAttributedString(string: "-")
