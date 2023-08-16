@@ -116,8 +116,9 @@ extension ViewController {
                     let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
                     let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
                     let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
+                    let movieCode = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieCode
                     
-                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew)
+                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew, movieCode: movieCode)
                     
                     Item.all.append(items)
                 }
@@ -164,7 +165,9 @@ extension ViewController {
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
-        let detailViewController = DetailViewController()
+        guard let selectedMovieCode = dataSource?.itemIdentifier(for: indexPath)?.movieCode else { return }
+        
+        let detailViewController = DetailViewController(selectedMovieCode: selectedMovieCode )
         navigationController?.pushViewController(detailViewController, animated: true)
     }
 }
