@@ -9,12 +9,16 @@ import Foundation
 
 public protocol NetworkConfigurable {
     var baseURL: String { get }
-    var queryItems: [String: String]? { get }
+    var queryItems: [String: String]? { get set }
+    var headerParameters: [String: String]? { get }
 }
 
 extension NetworkConfigurable {
-    public func generateURLRequest() throws -> URLRequest {
+    public func generateURLRequest(config: ApiDataConfigurable) throws -> URLRequest {
         var urlQureyItems: [URLQueryItem] = []
+        
+        var allHeaders: [String: String] = config.headers
+        headerParameters?.forEach({ allHeaders.updateValue($1, forKey: $0) })
         
         guard var urlComponents = URLComponents(string: baseURL) else {
             throw NetworkConfigurableError.urlComponents
@@ -30,7 +34,8 @@ extension NetworkConfigurable {
             throw NetworkConfigurableError.url
         }
         
-        let requestURL = URLRequest(url: url)
+        var requestURL = URLRequest(url: url)
+        requestURL.allHTTPHeaderFields = allHeaders
         
         return requestURL
     }

@@ -12,6 +12,7 @@ class ViewController: UIViewController {
     let networkManager: NetworkManager = NetworkManager()
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
+    private var queryParameters: [String: String] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -21,8 +22,7 @@ class ViewController: UIViewController {
         self.fetchDate()
         self.configureHierarchy()
         self.initRefreshControl()
-        
-        fetchBoxOfficeData {
+        self.fetchBoxOfficeData(networkManager: networkManager, queryParameters: ["key": Bundle.main.API, "targetDt": "\(dateCountUpForTest)"]) {
             DispatchQueue.main.async {
                 self.configureDataSource()
             }
@@ -169,5 +169,25 @@ extension ViewController: UICollectionViewDelegate {
         
         let detailViewController = DetailViewController(selectedMovieCode: selectedMovieCode )
         navigationController?.pushViewController(detailViewController, animated: true)
+    }
+}
+
+extension ViewController: NetworkConfigurable, Fetchable {
+    var baseURL: String {
+         return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
+    }
+    
+    var queryItems: [String : String]? {
+        get {
+            return self.queryParameters
+        }
+        set {
+            guard let newValue = newValue else { return }
+            self.queryParameters = newValue
+        }
+    }
+    
+    var headerParameters: [String : String]? {
+        [:]
     }
 }

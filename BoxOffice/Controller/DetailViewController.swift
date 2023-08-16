@@ -134,7 +134,7 @@ extension DetailViewController {
         do {
             let endPoint = EndPoint(
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json",
-                queryItems: ["key":"d4bb1f8d42a3b440bb739e9d49729660","movieCd":selectedMovieCode]
+                queryItems: ["key": Bundle.main.API ,"movieCd":selectedMovieCode]
             )
             
             let url = try endPoint.generateURL(isFullPath: false)
