@@ -24,23 +24,44 @@ enum RankIntensity {
         }
     }
     
-    func attributedString(withFont font: UIFont) -> NSAttributedString {
-        let attributedString: NSMutableAttributedString
+    func attributedString(withFont font: UIFont) -> NSAttributedString? {
+        var attributedString: NSMutableAttributedString
+        let numberAttributedString: NSMutableAttributedString
+        
+        let returnAttributedString: NSMutableAttributedString = NSMutableAttributedString()
         
         switch self {
         case .up(let value):
-            attributedString = NSMutableAttributedString(string: "▲\(value)")
+            attributedString = NSMutableAttributedString(string: "▲")
             attributedString.addAttributes([
                 .foregroundColor: UIColor.red,
                 .font: font
             ], range: NSRange(location: 0, length: attributedString.length))
             
+            numberAttributedString = NSMutableAttributedString(string: "\(value)")
+            numberAttributedString.addAttributes([
+                .foregroundColor: UIColor.black,
+                .font: font
+            ], range: NSRange(location: 0, length: numberAttributedString.length))
+            
+            returnAttributedString.append(attributedString)
+            returnAttributedString.append(numberAttributedString)
+            
         case .down(let value):
-            attributedString = NSMutableAttributedString(string: "▼\(value)")
+            attributedString = NSMutableAttributedString(string: "▼")
             attributedString.addAttributes([
                 .foregroundColor: UIColor.blue,
                 .font: font
             ], range: NSRange(location: 0, length: attributedString.length))
+            
+            numberAttributedString = NSMutableAttributedString(string: "\(value)")
+            numberAttributedString.addAttributes([
+                .foregroundColor: UIColor.black,
+                .font: font
+            ], range: NSRange(location: 0, length: numberAttributedString.length))
+            
+            returnAttributedString.append(attributedString)
+            returnAttributedString.append(numberAttributedString)
             
         case .stay:
             attributedString = NSMutableAttributedString(string: "-")
@@ -48,7 +69,11 @@ enum RankIntensity {
                 .foregroundColor: UIColor.black,
                 .font: font
             ], range: NSRange(location: 0, length: attributedString.length))
+            
+            returnAttributedString.append(attributedString)
         }
-        return attributedString
+        
+
+        return returnAttributedString
     }
 }

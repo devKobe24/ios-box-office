@@ -92,7 +92,7 @@ extension CustomListCell {
         guard let rankIntensityData = rankIntensityData else { return }
         guard let rankIntensity = RankIntensity(fromString: rankIntensityData) else { return }
         let font = UIFont.preferredFont(forTextStyle: .caption1)
-        let attributedString = rankIntensity.attributedString(withFont: font)
+        guard let attributedString = rankIntensity.attributedString(withFont: font) else { return }
         completion(attributedString)
     }
 }
