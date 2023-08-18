@@ -10,7 +10,7 @@ import Foundation
 public protocol NetworkConfigurable {
     var baseURL: String { get }
     var queryItems: [String: String]? { get set }
-    var headerParameters: [String: String] { get }
+    var headerParameters: [String: String]? { get }
 }
 
 extension NetworkConfigurable {
@@ -18,6 +18,9 @@ extension NetworkConfigurable {
         var urlQureyItems: [URLQueryItem] = []
         var allHeaders: [String: String] = config.headers
         headerParameters.forEach { allHeaders.updateValue($1, forKey: $0) }
+        
+        var allHeaders: [String: String] = config.headers
+        headerParameters?.forEach({ allHeaders.updateValue($1, forKey: $0) })
         
         guard var urlComponents = URLComponents(string: baseURL) else {
             throw NetworkConfigurableError.urlComponents
@@ -35,7 +38,6 @@ extension NetworkConfigurable {
         
         var requestURL = URLRequest(url: url)
         requestURL.allHTTPHeaderFields = allHeaders
-        
         
         return requestURL
     }

@@ -12,7 +12,7 @@ class ViewController: UIViewController {
     let networkManager: NetworkManager = NetworkManager()
     let refreshControl: UIRefreshControl = UIRefreshControl()
     var dataSource: UICollectionViewDiffableDataSource<Section, Item>? = nil
-    var queryParameters: [String: String] = [:]
+    private var queryParameters: [String: String] = [:]
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -22,13 +22,7 @@ class ViewController: UIViewController {
         self.fetchDate()
         self.configureHierarchy()
         self.initRefreshControl()
-        self.fetchBoxOfficeData(
-            networkManager: networkManager,
-            queryParameters: [
-            "key": Bundle.main.API,
-            "targetDt": "\(dateCountUpForTest)"
-        ])
-        {
+        self.fetchBoxOfficeData(networkManager: networkManager, queryParameters: ["key": Bundle.main.API, "targetDt": "\(dateCountUpForTest)"]) {
             DispatchQueue.main.async {
                 self.configureDataSource()
             }
@@ -104,17 +98,25 @@ extension ViewController: NetworkConfigurable, Fetchable {
         [:]
     }
     
-    var baseURL: String {
-        return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
-    }
-    
-    var queryItems: [String : String]? {
-        get {
-            return self.queryParameters
-        }
-        set {
-            guard let newValue = newValue else { return }
-            self.queryParameters = newValue
+            networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
+                let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
+                for index in 0...(count-1) {
+                    let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
+                    let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankIntensity
+                    let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
+                    let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
+                    let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
+                    let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
+                    let movieCode = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieCode
+                    
+                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew, movieCode: movieCode)
+                    
+                    Item.all.append(items)
+                }
+                completion()
+            }
+        } catch {
+            print(error.localizedDescription)
         }
     }
     
@@ -197,12 +199,29 @@ extension ViewController {
 
 extension ViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        guard let selectedMovieCode = dataSource?.itemIdentifier(for: indexPath)?.movieCode else { return }
         
-        let movieName = Item.all.compactMap { $0.movieName }
-        let selectedMovieName = movieName[indexPath.row]
-        
-        
-        let detailViewController = DetailViewController(movieTitle: selectedMovieName)
+        let detailViewController = DetailViewController(selectedMovieCode: selectedMovieCode )
         navigationController?.pushViewController(detailViewController, animated: true)
+    }
+}
+
+extension ViewController: NetworkConfigurable, Fetchable {
+    var baseURL: String {
+         return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
+    }
+    
+    var queryItems: [String : String]? {
+        get {
+            return self.queryParameters
+        }
+        set {
+            guard let newValue = newValue else { return }
+            self.queryParameters = newValue
+        }
+    }
+    
+    var headerParameters: [String : String]? {
+        [:]
     }
 }

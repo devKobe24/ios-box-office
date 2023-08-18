@@ -2,33 +2,27 @@
 //  Fetchable.swift
 //  BoxOffice
 //
-//  Created by Minseong Kang on 2023/08/15.
+//  Created by by Kobe, yyss99 on 2023/08/16.
 //
 
 import Foundation
 
 protocol Fetchable: AnyObject, NetworkConfigurable {
-//    func fetchBoxOfficeData(networkManager: NetworkManager, queryParameters: [String: String], completion: @escaping () -> ())
 }
 
 extension Fetchable {
-    func fetchBoxOfficeData(networkManager: NetworkManager, queryParameters: [String: String], completion: @escaping () -> ()) {
-        
+    func fetchBoxOfficeData(networkManager: NetworkManager, queryParameters: [String: String], completion: @escaping () -> Void) {
         queryParameters.forEach { [weak self] (key, value) in
             self?.queryItems = [key: value]
         }
         
         do {
-            let endPoint = EndPoint(
-                headerParameters: [:],
-                baseURL: baseURL,
-                queryItems: queryParameters
-            )
+            let endPoint = EndPoint(baseURL: baseURL, queryItems: queryParameters)
             
             let url = try endPoint.generateURL(isFullPath: false)
             
             let urlRequest = URLRequest(url: url)
-    
+            
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
                 for index in 0...(count-1) {
@@ -38,9 +32,9 @@ extension Fetchable {
                     let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
                     let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
                     let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
+                    let movieCode = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieCode
                     
-                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew)
-                    
+                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew, movieCode: movieCode)
                     Item.all.append(items)
                 }
                 completion()
@@ -52,32 +46,25 @@ extension Fetchable {
 }
 
 extension Fetchable {
-    func fetchMoviePoster(networkManager: NetworkManager, headers: [String: String] ,queryParameters: [String: String]? = nil, completion: @escaping (String) -> ()) {
-        guard let queryParameters = queryParameters else { return }
+    func fetchMoviePoster(networkManager: NetworkManager, headers: [String: String] ,queryParameters: [String: String], completion: @escaping (String) -> Void) {
         queryParameters.forEach { [weak self] (key, value) in
             self?.queryItems = [key: value]
         }
         
         do {
-            let endPoint = EndPoint(
-                headerParameters: headers,
-                baseURL: baseURL,
-                queryItems: queryParameters
-            )
+            let endPoint = EndPoint(headerParameters: headers, baseURL: baseURL, queryItems: queryParameters)
             
             let url = try endPoint.generateURL(isFullPath: false)
-            let config = ApiDataNetWorkConfig(baseURL: url, headers: headers, queryParameters: queryParameters)
+            let config = ApiDataNetworkConfig(baseURL: url, headers: headers, queryParameters: queryParameters)
             let urlRequest = try generateURLRequest(config: config)
             
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
-                let moviePostersURLs = moviePoster.documents[0].imageUrl
-                guard let moviePosterUrl = MoviePoster(imageUrl: moviePostersURLs).imageUrl else { return }
-                completion(moviePosterUrl)
+                let moviePosterURL = moviePoster.documents[0].imageUrl
+                guard let moviePosterImageURL = MoviePoster(imageUrl: moviePosterURL).imageUrl else { return }
+                completion(moviePosterImageURL)
             }
         } catch {
             print(error.localizedDescription)
         }
     }
 }
-
-

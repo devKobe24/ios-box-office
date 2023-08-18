@@ -2,7 +2,7 @@
 //  ApiDataConfigurable.swift
 //  BoxOffice
 //
-//  Created by Minseong Kang on 2023/08/15.
+//  Created by by Kobe, yyss99 on 2023/08/16.
 //
 
 import Foundation
@@ -11,7 +11,6 @@ public protocol ApiDataConfigurable {
     var baseURL: URL { get }
     var headers: [String: String] { get }
     var queryParameters: [String: String] { get }
-    
 }
 
 struct ApiDataNetWorkConfig: ApiDataConfigurable {
@@ -22,8 +21,4 @@ struct ApiDataNetWorkConfig: ApiDataConfigurable {
     public init(baseURL: URL,
                 headers: [String : String],
                 queryParameters: [String : String]) {
-        self.baseURL = baseURL
-        self.headers = headers
-        self.queryParameters = queryParameters
-    }
 }

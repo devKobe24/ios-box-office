@@ -2,7 +2,7 @@
 //  KakaoImageSearchResult.swift
 //  BoxOffice
 //
-//  Created by Minseong Kang on 2023/08/15.
+//  Created by by Kobe, yyss99 on 2023/08/16.
 //
 
 import Foundation

@@ -8,31 +8,16 @@
 import UIKit
 
 class DetailViewController: UIViewController {
-    var movieTitle: String?
+    private var selectedMovieCode: String
+    private let scrollView: UIScrollView = UIScrollView()
+    private let contentView: UIView = UIView()
+    private let posterImageView: UIImageView = UIImageView()
+    private var detailInformation: IndividualMovieDetailInformation?
+    private let networkManager: NetworkManager = NetworkManager()
     
-    let scrollView: UIScrollView = {
-        let scrollView: UIScrollView = UIScrollView()
-        scrollView.translatesAutoresizingMaskIntoConstraints = false
-        return scrollView
-    }()
     
-    let contentView: UIView = {
-        let contentView: UIView = UIView()
-        contentView.translatesAutoresizingMaskIntoConstraints = false
-        return contentView
-    }()
-    
-    var movieImageView: UIImageView = {
-        var movieImageView: UIImageView = UIImageView()
-        movieImageView.translatesAutoresizingMaskIntoConstraints = false
-        return movieImageView
-    }()
-    
-    let networkManager: NetworkManager = NetworkManager()
-    var queryParameters: [String: String] = [:]
-    
-    init(movieTitle: String? = nil) {
-        self.movieTitle = movieTitle
+    init(selectedMovieCode: String) {
+        self.selectedMovieCode = selectedMovieCode
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -43,93 +28,125 @@ class DetailViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         self.view.backgroundColor = .systemBackground
+        configureScrollView()
+        configureMovieposter()
         
-        addSubViews()
-        setUpScrollViewConstraints()
-        setUpContentViewConstraints()
-        setUpMovieImageViewContraints()
-    }
-    
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
-        
-        guard let movieTitle = movieTitle else { return }
-        fetchMoviePoster(
-            networkManager: networkManager,
-            headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"],
-            queryParameters: ["query": "\(movieTitle)+포스터"]
-        ) { imgUrl in
-            guard let url = URL(string: imgUrl) else { return }
-            do {
-                let data: Data = try Data(contentsOf: url)
-                DispatchQueue.main.async { [weak self] in
-                    guard let moviePoster = UIImage(data: data) else { return }
-                    self?.movieImageView.image = moviePoster
-                }
-            } catch {
-                print(error.localizedDescription)
+        fetchDetailData {
+            DispatchQueue.main.async {
+                self.configureMovieStackView()
             }
         }
+    }
+    
+    private func configureScrollView() {
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.backgroundColor = .systemBackground
+        scrollView.showsVerticalScrollIndicator = false
+        
+        view.addSubview(scrollView)
+        
+        NSLayoutConstraint.activate([
+            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
+            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
+            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
+            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor)
+        ])
+        
+        contentView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.addSubview(contentView)
+        
+        NSLayoutConstraint.activate([
+            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
+            
+            contentView.widthAnchor.constraint(equalTo: scrollView.frameLayoutGuide.widthAnchor),
+            contentView.heightAnchor.constraint(equalTo: scrollView.contentLayoutGuide.heightAnchor)
+        ])
+    }
+    
+    private func configureMovieposter() {
+        posterImageView.translatesAutoresizingMaskIntoConstraints = false
+        posterImageView.backgroundColor = .black
+        
+        contentView.addSubview(posterImageView)
+        
+        NSLayoutConstraint.activate([
+            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            posterImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            posterImageView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.9),
+            posterImageView.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor, multiplier: 2/3)
+        ])
+    }
+    
+    func configureMovieStackView() {
+        let movieDetailStackView = UIStackView()
+        movieDetailStackView.translatesAutoresizingMaskIntoConstraints = false
+        movieDetailStackView.axis = .vertical
+        movieDetailStackView.spacing = 5
+        contentView.addSubview(movieDetailStackView)
+        
+        NSLayoutConstraint.activate([
+            movieDetailStackView.topAnchor.constraint(equalTo: posterImageView.bottomAnchor, constant: 10),
+            movieDetailStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor),
+            movieDetailStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -3),
+            movieDetailStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
+        ])
+        
+        guard let detail = detailInformation else { return }
+        makeStackView(categoryName: "감독", detail: detail.movieInfoResult.movieInfo.directors[0].directorName, in: movieDetailStackView)
+        makeStackView(categoryName: "제작년도", detail: detail.movieInfoResult.movieInfo.productionYear, in: movieDetailStackView)
+        makeStackView(categoryName: "개봉일", detail: detail.movieInfoResult.movieInfo.openDate, in: movieDetailStackView)
+        makeStackView(categoryName: "상영시간", detail: detail.movieInfoResult.movieInfo.showTime, in: movieDetailStackView)
+        makeStackView(categoryName: "관람등급", detail: detail.movieInfoResult.movieInfo.audits[0].watchGradeName, in: movieDetailStackView)
+        makeStackView(categoryName: "제작국가", detail: detail.movieInfoResult.movieInfo.productionNations[0].productionNations, in: movieDetailStackView)
+        makeStackView(categoryName: "장르", detail: detail.movieInfoResult.movieInfo.genres[0].genreName, in: movieDetailStackView)
+        makeStackView(categoryName: "배우", detail: detail.movieInfoResult.movieInfo.actors[0].peopleName, in: movieDetailStackView)
+    }
+    
+    func makeStackView(categoryName: String, detail: String, in movieDetailStackView: UIStackView){
+        let categoryLabel = UILabel()
+        let detailLabel = UILabel()
+        
+        detailLabel.text = detail
+        detailLabel.font = .preferredFont(forTextStyle: .body)
+        detailLabel.numberOfLines = 0
+        
+        categoryLabel.text = categoryName
+        categoryLabel.textAlignment = .center
+        categoryLabel.font = .preferredFont(forTextStyle: .body)
+        
+        let stackView = UIStackView(arrangedSubviews: [categoryLabel, detailLabel])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        
+        movieDetailStackView.addArrangedSubview(stackView)
+        
+        NSLayoutConstraint.activate([
+            categoryLabel.widthAnchor.constraint(equalTo: movieDetailStackView.widthAnchor, multiplier: 1/5)
+        ])
     }
 }
 
 extension DetailViewController {
-    private func addSubViews() {
-        view.addSubview(scrollView)
-        scrollView.addSubview(contentView)
-        contentView.addSubview(movieImageView)
-    }
-    
-    private func setUpScrollViewConstraints() {
-        NSLayoutConstraint.activate([
-            scrollView.leadingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.leadingAnchor),
-            scrollView.trailingAnchor.constraint(equalTo: view.safeAreaLayoutGuide.trailingAnchor),
-            scrollView.topAnchor.constraint(equalTo: view.safeAreaLayoutGuide.topAnchor),
-            scrollView.bottomAnchor.constraint(equalTo: view.safeAreaLayoutGuide.bottomAnchor),
-        ])
-    }
-    
-    private func setUpContentViewConstraints() {
-        NSLayoutConstraint.activate([
-            contentView.leadingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.leadingAnchor),
-            contentView.trailingAnchor.constraint(equalTo: scrollView.contentLayoutGuide.trailingAnchor),
-            contentView.topAnchor.constraint(equalTo: scrollView.contentLayoutGuide.topAnchor),
-            contentView.bottomAnchor.constraint(equalTo: scrollView.contentLayoutGuide.bottomAnchor),
-            contentView.widthAnchor.constraint(equalTo: scrollView.widthAnchor)
-        ])
-        
-        let contentViewHeight = contentView.heightAnchor.constraint(greaterThanOrEqualTo: view.heightAnchor)
-        contentViewHeight.priority = .defaultLow
-        contentViewHeight.isActive = true
-    }
-    
-    private func setUpMovieImageViewContraints() {
-        NSLayoutConstraint.activate([
-            movieImageView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            movieImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
-            movieImageView.widthAnchor.constraint(equalToConstant: 300),
-            movieImageView.heightAnchor.constraint(equalTo: movieImageView.widthAnchor, multiplier: 2),
-        ])
-        
-    }
-}
-
-extension DetailViewController: Fetchable, NetworkConfigurable {
-    var headerParameters: [String : String] {
-        ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"]
-    }
-    
-    var baseURL: String {
-        "https://dapi.kakao.com/v2/search/image?"
-    }
-    
-    var queryItems: [String : String]? {
-        get {
-            return self.queryParameters
-        }
-        set {
-            guard let newValue = newValue else { return }
-            return self.queryParameters = newValue
+    func fetchDetailData(completion: @escaping () -> Void) {
+        do {
+            let endPoint = EndPoint(
+                baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json",
+                queryItems: ["key": Bundle.main.API ,"movieCd":selectedMovieCode]
+            )
+            
+            let url = try endPoint.generateURL(isFullPath: false)
+            
+            let urlRequest = URLRequest(url: url)
+            
+            networkManager.getBoxOfficeData(requestURL: urlRequest) { (detail: IndividualMovieDetailInformation) in
+                self.detailInformation = detail
+                completion()
+            }
+        } catch {
+            print(error.localizedDescription)
         }
     }
 }

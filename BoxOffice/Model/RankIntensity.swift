@@ -2,7 +2,7 @@
 //  RankIntensity.swift
 //  BoxOffice
 //
-//  Created by Minseong Kang on 2023/08/16.
+//  Created by by Kobe, yyss99 on 2023/08/16.
 //
 
 import UIKit
@@ -29,7 +29,6 @@ enum RankIntensity {
         let numberAttributedString: NSMutableAttributedString
         
         let returnAttributedString: NSMutableAttributedString = NSMutableAttributedString()
-        
         switch self {
         case .up(let value):
             attributedString = NSMutableAttributedString(string: "▲")
@@ -76,7 +75,6 @@ enum RankIntensity {
             returnAttributedString.append(attributedString)
         }
         
-
         return returnAttributedString
     }
 }

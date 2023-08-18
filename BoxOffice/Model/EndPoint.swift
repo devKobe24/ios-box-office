@@ -6,7 +6,7 @@
 //
 
 public struct EndPoint: NetworkConfigurable {
-    public var headerParameters: [String : String]
+    public var headerParameters: [String : String]?
     public var baseURL: String
     public var queryItems: [String : String]?
 }
