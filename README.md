@@ -1,4 +1,4 @@
-# 박스오피스[STEP3]
+*# 박스오피스[STEP4]
 
 > 📌 네트워킹을 활용하여 박스오피스 데이터를 불러와 정보를 화면에 표기하고 리스트를 잡아끌면 새로고침할 수 있도록 하는 기능이 있는 앱입니다.
 
@@ -19,15 +19,22 @@
 ## 🗂️ 파일트리</br>
 ```
 .
-.
 ├── BoxOffice
 │   ├── API_KEY.plist
 │   ├── Model
+│   │   ├── ApiDataConfigurable.swift
 │   │   ├── BoxOffice.swift
 │   │   ├── EndPoint.swift
+│   │   ├── Fetchable.swift
+│   │   ├── IndividualMovieDetailInformation.swift
 │   │   ├── Item.swift
+│   │   ├── KakaoImageSearchResult.swift
+│   │   ├── MoviePoster.swift
 │   │   ├── NetworkConfigurable.swift
+│   │   ├── NetworkConfigure
+│   │   │   └── Implementation
 │   │   ├── NetworkManager.swift
+│   │   ├── RankIntensity.swift
 │   │   ├── Section.swift
 │   │   └── URLSession.swift
 │   ├── View
@@ -36,7 +43,8 @@
 │   │   │   └── Main.storyboard
 │   │   ├── CustomListCell.swift
 │   │   └── ItemListCell.swift
-│   ├──  Controller
+│   ├── Controller
+│   │   ├── DetailViewController.swift
 │   │   └── ViewController.swift
 │   ├── Error
 │   │   ├── NetworkConfigurableError.swift
@@ -44,12 +52,23 @@
 │   │   └── URLRequestError.swift
 │   ├── Extension
 │   │   ├── Bundle+.swift
+│   │   ├── DateFormatter+.swift
+│   │   ├── String+.swift
 │   │   ├── UICellConfigurationState+.swift
 │   │   └── UIConfigurationStateCustomKey+.swift
-│   ├── Info.plist
-│   ├── Resource
-│   │   ├── AppDelegate.swift
-│   │   └── SceneDelegate.swift
+│   │
+│   └── Resource
+│       ├── AppDelegate.swift
+│       ├── Assets.xcassets
+│       │   ├── AccentColor.colorset
+│       │   │   └── Contents.json
+│       │   ├── AppIcon.appiconset
+│       │   │   └── Contents.json
+│       │   ├── Contents.json
+│       │   └── box_office_sample.dataset
+│       │       ├── Contents.json
+│       │       └── box_office_sample.json
+│       └── SceneDelegate.swift
 ├── BoxOfficeTests
 │   ├── BoxOfficeTestPlan.xctestplan
 │   └── BoxOfficeTests.swift
@@ -57,7 +76,7 @@
 ```
 
 ## 🗺️ 시각화된 프로젝트 구조</br>
-<img src = "https://github.com/devKobe24/images/blob/main/BoxOffice_Step3.png?raw=true">
+<img src = "https://github.com/devKobe24/images/blob/main/BoxOffice_Step4_UML.png?raw=true">
 
 ## ⏰ 타임라인</br>
 프로젝트 진행 기간 | 23.07.10.(월) ~ 23.07.14.(금)
@@ -72,174 +91,205 @@
 | 23.08.06(일)     | Section 모델 구현.<br/>  UIConfigurationStateCustomKey 확장 및 구현. <br/> UICellConfigurationState 확장. <br/>
 | 23.08.08(화)     |UICellConfigurationState에 Item 추가. <br/>  boxOffice 구조체에 Hashable 포로토콜 채택. <br/>  UICellConfigurationState에 Item 추가. <br/> CustomListCell 생성. <br/> ItemListCell로 파일명 변경. <br/> CustomListCell 구현. <br/> configureDataSource, creatLayout 함수 구현
 | 23.08.10(목)     | Item 타입 생성.<br/> Item 타입으로 수정.<br/> generateURL 함수 수정.<br/> fetchBoxOfficeData 함수 생성, Item으로 수정.<br/> CustomListCell Layout 수정. <br/> ViewController refresh 기능 구현, navigationController 추가.
+| 23.08.11(금)     | CustomListCell Layout 수정. <br/> DateFormatter extension 파일 생성 및 구현, viewController에 적용. <br/>
+| 23.08.12(토)     | String을 확장하여 numberformat 함수 구현. <br/> numberformat 메서드 적용.<br/>  rankChangeLabel 순위 등락 표시 생성 및 적용
+| 23.08.13(일)     | DetailViewController 생성. <br/> DetailViewController로 화면 전환을 위한 메서드 구현 <br/> CustomListCell 순위등락 기능 추가 및 수정.
+| 23.08.16(수)     | RankIntensity 추가 및 CustomListCell 등락 표시 기능 수정. <br/> detailViewController 이동 로직 구현. <br/> DetailViewController 초기 필수 사항 구현. <br/>  movieCode 프로퍼티 추가. <br/> IndividualMovieDetailInfomation 모델 객체 구현.<br/> DetailViewController UI 구성 및 Layout 구현. <br/>  ApiDataConfigurable, ApiDataNetworkConfig 생성 및 구현. <br/> viewController 데이터 가져오는 기능 수정.
+| 23.08.18(금)     |배우 이름 로직 변경, 영화 포스터 mock 이미지 삽입.
+
+
 
 ## 📺 실행화면</br>
 - STEP3 BoxOffice 시뮬레이터 실행화면 🎬 </br>
-<img src = "https://github.com/devKobe24/images/blob/main/BOXOFFICE_STEP3.gif?raw=true">
+<img src = "https://github.com/devKobe24/images/blob/main/BoxOffice_STEP4.gif?raw=true">
 
 ## 🔨 트러블 슈팅 
-### 1️⃣ **오늘 날짜로 targetDt를 parameter로 설정하고 GET을 SEND했을 경우 데이터가 빈값으로 들어옵니다.**</br>
+### 1️⃣ **배우가 빈 값인 경우가 있습니다.**</br>
 ### 🔒 **문제점** 🔒</br>
-<img src = "https://github.com/devKobe24/images/blob/main/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202023-08-11%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%2011.41.50.png?raw=true"></br>
+<img src = "https://github.com/devKobe24/images/blob/main/Boxoffice_STEP4_%E1%84%90%E1%85%B3%E1%84%85%E1%85%A5%E1%84%87%E1%85%B3%E1%86%AF%E1%84%89%E1%85%B2%E1%84%90%E1%85%B5%E1%86%BC(1).png?raw=true"></br>
 
-**🚨 `postman`으로 확인해본 결과 `targetDt`를 오늘 날자로 설정하고 `GET`으로 요청을 보냈을 경우 빈 데이터가 돌아오는 것을 확인 할 수 있었습니다.**</br>
+**🚨 `postman`으로 확인해본 결과 `staffs`가 빈 배열로 결과값이 들어오는 경우가 있었습니다.**</br>
 
 ### 🔑 **해결방법** 🔑</br>
-**🙋‍♂️ 그러므로 화면 상단 네비게이션 타이틀에는 현재 날짜를 보여주게 만들고</br>실제 통신하여 가져오는 데이터는 오늘로부터 24시간 전</br>전날의 데이터를 가져와서 화면에 보여지게 만들려고 계획중이며 코드는 아래와 같이 구성할 예정입니다.**
+**🙋‍♂️ 비어있는 배열이 들어올 경우 "없음"이라는 값으로 actorNames에 값을 주고 값이 있을 경우에는 콤마를 기준으로 새로운 값을 actorNames에 값을 줄 수 있는 계산 프로퍼티를 만들었습니다.</br>이 계산 프로퍼티를 makeStackView의 detail에 값으로 넣어주어 해결하였습니다.**
 
 <details> 
-<summary> FetchDateable Model </summary>
+<summary> DetailViewController </summary>
 
 ```swift!
-import Foundation
+import UIKit
 
-protocol FetchDateble {
+class DetailViewController: UIViewController {
+        private var detailInformation: IndividualMovieDetailInformation?
+        private let networkManager: NetworkManager = NetworkManager()
     
-}
-
-extension FetchDateble {
-    func fetchDate() -> String {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
-        dateFormatter.dateFormat = "yyyy-MM-dd"
-        let fetchDate = dateFormatter.string(from: currentDate)
+            override func viewDidLoad() {
+            super.viewDidLoad()
         
-        return fetchDate
-    }
-    
-    func fetchDateForTargetDt() throws -> String {
-        let currentDate = Date()
-        let dateFormatter = DateFormatter()
-        dateFormatter.locale = Locale(identifier: "ko_KR")
-        dateFormatter.dateFormat = "yyyyMMdd"
-        let calener = Calendar.current
-        let yesterDay = calener.date(byAdding: .day, value: -1, to: currentDate)
-        guard let yesterDay = yesterDay else {
-            throw FetchDateForTargetDtError.unwrap
-        }
-        let fetchDate = dateFormatter.string(from: yesterDay)
-        
-        return fetchDate
-    }
-}
-
-enum FetchDateForTargetDtError: Error {
-    case unwrap
-}
-```
-</details>
-
-<details> 
-<summary> ViewController </summary>
-
-```swift!
-class ViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        self.configureHierarchy()
-        self.initRefreshControl()
-        
-        fetchBoxOfficeData {
-            DispatchQueue.main.async {
-                self.configureDataSource()
-                self.setupNavigationTitle()
+            fetchDetailData {
+                DispatchQueue.main.async {
+                    self.configureMovieStackView()
+                }
             }
         }
+    
+        func configureMovieStackView() {
+    
+        let movieDetailStackView = UIStackView()
+    
+        movieDetailStackView.translatesAutoresizingMaskIntoConstraints = false
+        movieDetailStackView.axis = .vertical
+        movieDetailStackView.spacing = 5
+    
+        contentView.addSubview(movieDetailStackView)
+        
+        NSLayoutConstraint.activate([
+            movieDetailStackView.topAnchor.constraint(
+            equalTo: posterImageView.bottomAnchor,
+            constant: 10
+        ),
+            movieDetailStackView.leadingAnchor.constraint(
+                equalTo: contentView.leadingAnchor
+        ),
+            movieDetailStackView.trailingAnchor.constraint(
+                equalTo: contentView.trailingAnchor,
+                constant: -3
+        ),
+            movieDetailStackView.bottomAnchor.constraint(
+        equalTo: contentView.bottomAnchor
+        )
+            ])
+        
+        guard let detail = detailInformation else { return }
+    
+        makeStackView(
+            categoryName: "감독",
+            detail: detail.movieInfoResult.movieInfo.directors[0].directorName,
+            in: movieDetailStackView
+        )
+        makeStackView(
+            categoryName: "제작년도",
+            detail: detail.movieInfoResult.movieInfo.productionYear,
+            in: movieDetailStackView
+        )
+        makeStackView(
+            categoryName: "개봉일",
+            detail: detail.movieInfoResult.movieInfo.openDate,
+            in: movieDetailStackView
+        )
+        makeStackView(
+            categoryName: "상영시간",
+            detail: detail.movieInfoResult.movieInfo.showTime,
+            in: movieDetailStackView
+        )
+        makeStackView(
+            categoryName: "관람등급",
+            detail: detail.movieInfoResult.movieInfo.audits[0].watchGradeName,
+            in: movieDetailStackView
+        )
+        makeStackView(
+            categoryName: "제작국가",
+           detail: detail.movieInfoResult.movieInfo.productionNations[0].productionNations,
+            in: movieDetailStackView
+        )
+        makeStackView(
+            categoryName: "장르",
+            detail: detail.movieInfoResult.movieInfo.genres[0].genreName,
+            in: movieDetailStackView
+        )
+            var actorNames: String {
+        if detail.movieInfoResult.movieInfo.actors.isEmpty {
+            return "없음"
+        } else {
+            let actorsNameInList = detail.movieInfoResult.movieInfo.actors.map { $0.peopleName }
+            return actorsNameInList.joined(separator: ", ")
+        }
+            }
+        makeStackView(
+            categoryName: "배우",
+            detail: actorNames,
+            in: movieDetailStackView
+        )
     }
 }
 ```
 </details>
 
 <details> 
-<summary> ViewController Extension </summary>
+<summary> DetailViewController Extension </summary>
 
 ```swift!
-extension ViewController: FetchDateble {
-    private func setupNavigationTitle() {
-        navigationItem.title = fetchDate()
+import UIKit
+    
+extension DetailViewController {
+    func fetchDetailData(completion: @escaping () -> Void) {
+        do {
+            let endPoint = EndPoint(
+                baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json",
+                queryItems: ["key": Bundle.main.API ,"movieCd":selectedMovieCode]
+            )
+            
+            let url = try endPoint.generateURL(isFullPath: false)
+            
+            let urlRequest = URLRequest(url: url)
+            
+            networkManager.getBoxOfficeData(requestURL: urlRequest) { (detail: IndividualMovieDetailInformation) in
+                self.detailInformation = detail
+                completion()
+            }
+        } catch {
+            print(error.localizedDescription)
+        }
     }
 }
+
 ```
 </details>
-<br>
 
-### 2️⃣ **화면을 새로고침을 할 때 새로운 데이터가 들어올 경우 데이터를 업데이트 해주는 방법.**</br>
+### 2️⃣ **이미지 쿼리 명에 따라 달리 나오는 이미지 결과.** </br>
 ### 🔒 **문제점** 🔒</br>
-**🚨 화면을 땅겨서 새로고침 액션을 실행할 경우, 새로운 데이터가 들어오는 경우에도 불구하고 화면에 새로운 데이터가 새롭게 업데이트 되지 않는 문제점이 있었습니다.**
+**🚨 이미지 검색시 쿼리의 Value를 `[영화제목 + 영화 포스터]`로 검색 했을 때, 검색 결과가 제대로 된 이미지를 가져오지 못하는 현상이 있었습니다.**
 
 ### 🔑 **해결방법** 🔑</br>
-`UICollectionView.CellRegistration` 타입의 `CellRegistration`을 만들고 커스텀하게 `UICollectionViewListCell` 타입의 `ItemListCell` 이름으로 클래스를 만들어 줍니다.</br>
+🙋‍♂️`[영화제목 + 포스터]`라는 Value를 사용하여 이미지 검색 결과의 정확도를 높혔습니다.</br>
 
-`ItemListCell` 내부에 `updateWithItem(_:)` 함수를 구현하여 이 함수로 새로운 데이터가 들어올 경우 아이템을 업데이트하게 합니다.</br>
+- 1. `[나홀로집에 + 영화 포스터] 검색 결과` 예시.
+    - <img src = "https://github.com/devKobe24/images/blob/main/%E1%84%8C%E1%85%B5%E1%84%80%E1%85%AA%E1%86%AB%E1%84%90%E1%85%A9%E1%86%BC.jpeg?raw=true" width = 300>
+- 2. `[나홀로집에 + 포스터] 검색 결과` 예시
+    - <img src = "https://github.com/devKobe24/images/blob/main/%E1%84%82%E1%85%A1%E1%84%92%E1%85%A9%E1%86%AF%E1%84%85%E1%85%A9%20%E1%84%8C%E1%85%B5%E1%86%B8%E1%84%8B%E1%85%A6%201.jpg?raw=true"  width = 300>
 
-`UICollectionViewDiffableDataSource` 타입의 데이터소스를 만들고 `return` 값으로 `collectionView`의 `dequeueConfiguredReusableCell(using:for:item:)`을 활용하여 각각의 `parameter`에 맞는 값을 넣어줍니다.</br>
+### 3️⃣ ScrollView에서 poster의 높이를 정해주기
 
-특히 `using` 파라미터에는 위에서 만든 `cellRegistration`을 넣어줍니다.</br>
-
-이후 `NSDiffableDataSourceSnapshot` 타입의 스냅샷을 만들어 `SectionIdentifierType`에는 미리 만들어 놓은 `Seciotn` 열거형을 넣어주고 `ItemIdentifierType`에는 `Item` 구조체를 넣어주어 `snapshot` 인스턴스를 만듭니다.</br>
-
-`snapshot.append(Item.all)`을 구현하고 `snapshot` 인스턴스와 `dataSource` 인스턴스를 활용하여 `dataSource.apply(snapshot)`을 구현하여 새로운 데이터가 들어올 경우 데이터를 업데이트해 줄 수 있도록 하였습니다.</br>
-
-### 3️⃣ CollectionListView에서 임의로 높이를 주기</br>
 ### 🔒 **문제점** 🔒</br>
+`poster`는 화면에서 영화에 대한 세부 설명 위쪽에 고정되어서 일정한 크기를 유지해야 합니다. 스크롤뷰 였기 때문에 `Constraint`를 어떤 식으로 잡을지 고민을 많이 했습니다.
 
-셀의 위아래 여백을 주기 위해 cell의 constraint를 잡았으나 Layout 오류가 발생 했습니다. 높이를 따로 지정해 주지 않았는데도 불구하고 Height의 값이 44로 잡혀 있다는 오류가 발생했습니다. 검색 결과, 자동적으로 cell 높이를 부여해준다는 사실을 알았습니다. 
+### 🔑 **해결방법** 🔑</br>
 
-```swift!
+```swift
 NSLayoutConstraint.activate([
-        listContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60),
-        listContentView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
-        listContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-        listContentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30),
-            
-        movieRankStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
-        movieRankStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
-        movieRankStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
+            posterImageView.topAnchor.constraint(equalTo: contentView.topAnchor),
+            posterImageView.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
+            posterImageView.widthAnchor.constraint(equalTo: contentView.widthAnchor, multiplier: 0.9),
+            posterImageView.heightAnchor.constraint(equalTo: scrollView.frameLayoutGuide.heightAnchor, multiplier: 2/3)
         ])
 ```
-### 🔑 **해결방법** 🔑</br>
 
-1. 첫번째 해결 방법 - `listContentView` 위 아래 공백에 더 큰 `priority`주기
-    
-     `cell`의 자동적으로 정해져 있는 `height`보다 `listContentView`의 아래 공백을 조정하는 `constraint`에 높은 `priority`를 줍니다. 이런 식으로 하면 자동적으로 잡혀있던 `cell`의 `height` 값이 무시되면서 강제로 `listContentView` 위 아래로 공백을 잡아주어서 코드로 잡아준 `layout`이 적용됩니다.
-
-```swift!
-let listContentViewBottomConstraint = listContentView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
-        listContentViewBottomConstraint.priority = .defaultHigh
-        let movieRankStackViewBottomConstraint = movieRankStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -30)
-        movieRankStackViewBottomConstraint.priority = .defaultHigh
-               
-        NSLayoutConstraint.activate([
-            listContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60),
-            listContentView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
-            listContentView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor),
-            listContentViewBottomConstraint,
-            
-            movieRankStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
-            movieRankStackView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 30),
-            movieRankStackViewBottomConstraint
-        ])
-```
-2. 두번째 해결 방법 - `cell` 자체의 `height`를 고정해주기
-    `cell`에 접근해서 `cell` 자체의 `height`를 결정해주고 이 `cell`의 `height`에 높은 `priority`를 줍니다. 자동적으로 잡혀있던 `cell`의 `height`보다 `code`로 준 `height`가 적용됩니다.
-
-```swift!
-let contentViewHeightConstraint = contentView.heightAnchor.constraint(equalToConstant: 100)
-        contentViewHeightConstraint.priority = .defaultHigh
-     
-        NSLayoutConstraint.activate([
-            contentViewHeightConstraint,
-            listContentView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 60),
-            listContentView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor),
-            
-            movieRankStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 30),
-            movieRankStackView.centerYAnchor.constraint(equalTo: contentView.centerYAnchor)
-        ])
-```
+`poster`의 높이를 `contentView`가 아닌 `frameLayout`을 기준으로 비율을 정해주었습니다. 
+`contentView`는 스크롤 했을 때 보이는 모든 화면 크기를 기준으로 하고 있으므로 유동적입니다. 그래서 `contentView`를 기준으로 `poster`의 크기를 잡게 되면, 그때그때 담기는 값에 따라 달라지는 스크롤뷰의 높이에 따라서 `poster`의 높이도 매번 바뀌게 됩니다. 그래서 변하지 않고 현재 화면을 기준으로 하는 `frameLayout`을 높이로 `poster`에 대한 `constraint`를 잡아주었습니다.
 
 ## 📑 참고자료
+- [📃 Encoding, Decoding, and Serialization](https://developer.apple.com/documentation/swift/encoding-decoding-and-serialization)
+    - [📃 Decodable](https://developer.apple.com/documentation/swift/decodable)
+    - [📃 CodingKey](https://developer.apple.com/documentation/swift/codingkey)
+- [📃 Basic Behaviors](https://developer.apple.com/documentation/swift/basic-behaviors)
+    - [📃 Hashable](https://developer.apple.com/documentation/swift/hashable)
+    - [📃 Identifiable](https://developer.apple.com/documentation/swift/identifiable)
+- [📃 UIFont](https://developer.apple.com/documentation/uikit/uifont)
+    - [📃 preferredFont(forTextStyle:)](https://developer.apple.com/documentation/uikit/uifont/1619030-preferredfont)
+- [📃 Generics](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/generics/)
+- [📃 Protocols](https://docs.swift.org/swift-book/documentation/the-swift-programming-language/protocols/)
+- [📃 UIStackView](https://developer.apple.com/documentation/uikit/uistackview)
+- [📃 UIScrollView](https://developer.apple.com/documentation/uikit/uiscrollview)
 - [📃 snapshot()](https://developer.apple.com/documentation/uikit/uicollectionviewdiffabledatasource/3255141-snapshot)
 - [📃 UICollectionViewListCell](https://developer.apple.com/documentation/uikit/uicollectionviewlistcell)
 - [📃 UICollectionView.CellRegistration](https://developer.apple.com/documentation/uikit/uicollectionview/cellregistration)
