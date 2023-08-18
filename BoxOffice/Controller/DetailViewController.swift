@@ -69,6 +69,7 @@ class DetailViewController: UIViewController {
     private func configureMovieposter() {
         posterImageView.translatesAutoresizingMaskIntoConstraints = false
         posterImageView.backgroundColor = .black
+        posterImageView.image = UIImage(systemName: "person")
         
         contentView.addSubview(posterImageView)
         
@@ -102,7 +103,15 @@ class DetailViewController: UIViewController {
         makeStackView(categoryName: "관람등급", detail: detail.movieInfoResult.movieInfo.audits[0].watchGradeName, in: movieDetailStackView)
         makeStackView(categoryName: "제작국가", detail: detail.movieInfoResult.movieInfo.productionNations[0].productionNations, in: movieDetailStackView)
         makeStackView(categoryName: "장르", detail: detail.movieInfoResult.movieInfo.genres[0].genreName, in: movieDetailStackView)
-        makeStackView(categoryName: "배우", detail: detail.movieInfoResult.movieInfo.actors[0].peopleName, in: movieDetailStackView)
+        var actorNames: String {
+            if detail.movieInfoResult.movieInfo.actors.isEmpty {
+                return "없음"
+            } else {
+                let actorsNameInList = detail.movieInfoResult.movieInfo.actors.map { $0.peopleName }
+                return actorsNameInList.joined(separator: ", ")
+            }
+        }
+        makeStackView(categoryName: "배우", detail: actorNames, in: movieDetailStackView)
     }
     
     func makeStackView(categoryName: String, detail: String, in movieDetailStackView: UIStackView){
