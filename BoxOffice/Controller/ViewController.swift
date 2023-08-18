@@ -22,11 +22,11 @@ class ViewController: UIViewController {
         self.fetchDate()
         self.configureHierarchy()
         self.initRefreshControl()
-        self.fetchBoxOfficeData(networkManager: networkManager, queryParameters: ["key": Bundle.main.API, "targetDt": "\(dateCountUpForTest)"]) {
-            DispatchQueue.main.async {
-                self.configureDataSource()
-            }
-        }
+//        self.fetchBoxOfficeData(networkManager: networkManager, queryParameters: ["key": Bundle.main.API, "targetDt": "\(dateCountUpForTest)"]) {
+//            DispatchQueue.main.async {
+//                self.configureDataSource()
+//            }
+//        }
     }
     
     func createLayout() -> UICollectionViewLayout {
@@ -93,32 +93,30 @@ extension ViewController {
     }
 }
 
-extension ViewController: NetworkConfigurable, Fetchable {
-    var headerParameters: [String : String] {
-        [:]
-    }
-    
-            networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
-                let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
-                for index in 0...(count-1) {
-                    let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
-                    let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankIntensity
-                    let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
-                    let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
-                    let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
-                    let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
-                    let movieCode = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieCode
-                    
-                    let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew, movieCode: movieCode)
-                    
-                    Item.all.append(items)
-                }
-                completion()
-            }
-        } catch {
-            print(error.localizedDescription)
-        }
-    }
+//extension ViewController: NetworkConfigurable, Fetchable {
+//    var headerParameters: [String : String] {
+//        [:]
+//    }
+//
+//    networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
+//        let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
+//        for index in 0...(count-1) {
+//            let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
+//            let rankIntensity = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankIntensity
+//            let movieName = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieName
+//            let audienceCount = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceCount
+//            let audienceAccumulated = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].audienceAccumulated
+//            let rankOldAndNew = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankOldAndNew
+//            let movieCode = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].movieCode
+//
+//            let items = Item(rankNumber: rankNumber, rankIntensity: rankIntensity, movieName: movieName, audienceCount: audienceCount, audienceAccumulated: audienceAccumulated, rankOldAndNew: rankOldAndNew, movieCode: movieCode)
+//
+//            Item.all.append(items)
+//        }
+//        completion()
+//    }
+//}
+
     
     
 //    func fetchBoxOfficeData(completion: @escaping () -> ()) {
@@ -155,7 +153,7 @@ extension ViewController: NetworkConfigurable, Fetchable {
 //            print(error.localizedDescription)
 //        }
 //    }
-}
+//}
 
 extension ViewController {
     private func initRefreshControl() {
@@ -167,23 +165,23 @@ extension ViewController {
         self.dateCountUpForTest += 1
         Item.all.removeAll()
         
-        self.fetchBoxOfficeData(
-            networkManager: networkManager,
-            queryParameters: [
-            "key": Bundle.main.API,
-            "targetDt": "\(dateCountUpForTest)"
-        ])
-        {
-            DispatchQueue.main.async {
-                var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
-                snapshot.appendSections([.main])
-                snapshot.appendItems(Item.all)
-                guard let dataSource = self.dataSource else { return }
-                dataSource.apply(snapshot)
-                
-                self.refreshControl.endRefreshing()
-            }
-        }
+//        self.fetchBoxOfficeData(
+//            networkManager: networkManager,
+//            queryParameters: [
+//            "key": Bundle.main.API,
+//            "targetDt": "\(dateCountUpForTest)"
+//        ])
+//        {
+//            DispatchQueue.main.async {
+//                var snapshot = NSDiffableDataSourceSnapshot<Section, Item>()
+//                snapshot.appendSections([.main])
+//                snapshot.appendItems(Item.all)
+//                guard let dataSource = self.dataSource else { return }
+//                dataSource.apply(snapshot)
+//                
+//                self.refreshControl.endRefreshing()
+//            }
+//        }
     }
 }
 
@@ -206,22 +204,22 @@ extension ViewController: UICollectionViewDelegate {
     }
 }
 
-extension ViewController: NetworkConfigurable, Fetchable {
-    var baseURL: String {
-         return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
-    }
-    
-    var queryItems: [String : String]? {
-        get {
-            return self.queryParameters
-        }
-        set {
-            guard let newValue = newValue else { return }
-            self.queryParameters = newValue
-        }
-    }
-    
-    var headerParameters: [String : String]? {
-        [:]
-    }
-}
+//extension ViewController: NetworkConfigurable, Fetchable {
+//    var baseURL: String {
+//         return "http://www.kobis.or.kr/kobisopenapi/webservice/rest/boxoffice/searchDailyBoxOfficeList.json"
+//    }
+//
+//    var queryItems: [String : String]? {
+//        get {
+//            return self.queryParameters
+//        }
+//        set {
+//            guard let newValue = newValue else { return }
+//            self.queryParameters = newValue
+//        }
+//    }
+//
+//    var headerParameters: [String : String]? {
+//        [:]
+//    }
+//}

@@ -17,10 +17,10 @@ extension NetworkConfigurable {
     public func generateURLRequest(config: ApiDataConfigurable) throws -> URLRequest {
         var urlQureyItems: [URLQueryItem] = []
         var allHeaders: [String: String] = config.headers
-        headerParameters.forEach { allHeaders.updateValue($1, forKey: $0) }
+        headerParameters?.forEach { allHeaders.updateValue($1, forKey: $0) }
         
-        var allHeaders: [String: String] = config.headers
-        headerParameters?.forEach({ allHeaders.updateValue($1, forKey: $0) })
+//        var allHeaders: [String: String] = config.headers
+//        headerParameters?.forEach({ allHeaders.updateValue($1, forKey: $0) })
         
         guard var urlComponents = URLComponents(string: baseURL) else {
             throw NetworkConfigurableError.urlComponents
