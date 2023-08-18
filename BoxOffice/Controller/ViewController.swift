@@ -191,3 +191,7 @@ extension ViewController: NetworkConfigurable, Fetchable {
         [:]
     }
 }
+
+extension ViewController {
+//    self.fetchMoviePoster(networkManager: networkManager, headers: <#T##[String : String]#>, queryParameters: <#T##[String : String]#>, completion: <#T##(String) -> Void#>)
+}

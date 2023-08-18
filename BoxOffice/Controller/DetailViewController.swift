@@ -14,6 +14,7 @@ class DetailViewController: UIViewController {
     private let posterImageView: UIImageView = UIImageView()
     private var detailInformation: IndividualMovieDetailInformation?
     private let networkManager: NetworkManager = NetworkManager()
+    private var queryParameters: [String: String] = [:]
     
     
     init(selectedMovieCode: String) {
@@ -94,6 +95,8 @@ class DetailViewController: UIViewController {
             movieDetailStackView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor)
         ])
         
+        
+        
         guard let detail = detailInformation else { return }
         makeStackView(categoryName: "감독", detail: detail.movieInfoResult.movieInfo.directors[0].directorName, in: movieDetailStackView)
         makeStackView(categoryName: "제작년도", detail: detail.movieInfoResult.movieInfo.productionYear, in: movieDetailStackView)
@@ -102,7 +105,16 @@ class DetailViewController: UIViewController {
         makeStackView(categoryName: "관람등급", detail: detail.movieInfoResult.movieInfo.audits[0].watchGradeName, in: movieDetailStackView)
         makeStackView(categoryName: "제작국가", detail: detail.movieInfoResult.movieInfo.productionNations[0].productionNations, in: movieDetailStackView)
         makeStackView(categoryName: "장르", detail: detail.movieInfoResult.movieInfo.genres[0].genreName, in: movieDetailStackView)
-        makeStackView(categoryName: "배우", detail: detail.movieInfoResult.movieInfo.actors[0].peopleName, in: movieDetailStackView)
+        
+        var actorNames: String {
+            if detail.movieInfoResult.movieInfo.actors.isEmpty {
+                return "없음"
+            } else {
+                let actorsNameInList = detail.movieInfoResult.movieInfo.actors.map { $0.peopleName }
+                return actorsNameInList.joined(separator: ", ")
+            }
+        }
+        makeStackView(categoryName: "배우", detail: actorNames, in: movieDetailStackView)
     }
     
     func makeStackView(categoryName: String, detail: String, in movieDetailStackView: UIStackView){
@@ -150,3 +162,29 @@ extension DetailViewController {
         }
     }
 }
+
+extension DetailViewController: NetworkConfigurable, Fetchable {
+    var baseURL: String {
+        "https://dapi.kakao.com/v2/search/image"
+    }
+    
+    var queryItems: [String : String]? {
+        get {
+            return self.queryParameters
+        }
+        set {
+            guard let newValue = newValue else { return }
+            self.queryParameters = newValue
+        }
+    }
+    
+    var headerParameters: [String : String]? {
+        [:]
+    }
+}
+
+extension DetailViewController {
+//    self.fetchMoviePoster(networkManager: networkManager, headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"], queryParameters: ["query":"\(영화제목+포스터)"], completion: <#T##(String) -> Void#>)
+}
+
+
