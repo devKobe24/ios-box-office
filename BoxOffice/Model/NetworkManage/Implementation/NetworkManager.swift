@@ -2,14 +2,10 @@
 //  NetworkManager.swift
 //  BoxOffice
 //
-//  Created by Kobe, yyss99 on 2023/07/28.
+//  Created by Minseong Kang on 2023/08/19.
 //
 
 import Foundation
-
-public protocol Gettable {
-    func getBoxOfficeData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void)
-}
 
 struct NetworkManager: Gettable {
     func getBoxOfficeData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void) {

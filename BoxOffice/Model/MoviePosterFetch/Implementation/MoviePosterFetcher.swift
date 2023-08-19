@@ -25,20 +25,20 @@ class MoviePosterFetcher: MoviePosterFetchable {
         networkManager: NetworkManager,
         headers: [String: String],
         queryParameters: [String: String],
-        completion: @escaping (String) -> Void
+        completion: @escaping (_ imgURL: String) -> Void
     ) {
         queryParameters.forEach { [weak self] (key, value) in
             self?.queryItems = [key: value]
         }
         
         do {
-            let endPoint = EndPoint(
-                headerParameters: headers,
+            let networkConfigurer = NetworkConfigurer(
                 baseURL: baseURL,
-                queryItems: queryParameters
+                queryItems: queryParameters,
+                headerParameters: headers
             )
             
-            let url = try endPoint.generateURL(isFullPath: false)
+            let url = try networkConfigurer.generateURL(isFullPath: false)
             
             let config = ApiDataNetWorkConfigurer(
                 baseURL: url,
@@ -46,7 +46,7 @@ class MoviePosterFetcher: MoviePosterFetchable {
                 queryParameters: queryParameters
             )
             
-            let urlRequest = try generateURLRequest(config: config)
+            let urlRequest = try networkConfigurer.generateURLRequest(config: config)
             
             networkManager.getBoxOfficeData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
                 let moviePosterURL = moviePoster.documents[0].imageUrl

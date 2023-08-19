@@ -9,16 +9,24 @@ import UIKit
 
 class DetailViewController: UIViewController {
     private var selectedMovieCode: String
+    private var movieTitle: String
     private let scrollView: UIScrollView = UIScrollView()
     private let contentView: UIView = UIView()
     private let posterImageView: UIImageView = UIImageView()
     private var detailInformation: IndividualMovieDetailInformation?
     private let networkManager: NetworkManager = NetworkManager()
     private var queryParameters: [String: String] = [:]
+    private var moviePosterFetcher: MoviePosterFetcher
     
     
-    init(selectedMovieCode: String) {
+    init(
+        selectedMovieCode: String,
+        movieTitle:String,
+        moviePosterFetcher: MoviePosterFetcher
+    ) {
         self.selectedMovieCode = selectedMovieCode
+        self.movieTitle = movieTitle
+        self.moviePosterFetcher = moviePosterFetcher
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -36,6 +44,9 @@ class DetailViewController: UIViewController {
             DispatchQueue.main.async {
                 self.configureMovieStackView()
             }
+        }
+        self.fetchMoviePoster { posterImg in
+            self.posterImageView.image = posterImg
         }
     }
     
@@ -69,8 +80,6 @@ class DetailViewController: UIViewController {
     
     private func configureMovieposter() {
         posterImageView.translatesAutoresizingMaskIntoConstraints = false
-        posterImageView.backgroundColor = .black
-        
         contentView.addSubview(posterImageView)
         
         NSLayoutConstraint.activate([
@@ -144,12 +153,18 @@ class DetailViewController: UIViewController {
 extension DetailViewController {
     func fetchDetailData(completion: @escaping () -> Void) {
         do {
-            let endPoint = EndPoint(
+            let networkConfigurer: NetworkConfigurer = NetworkConfigurer(
                 baseURL: "http://www.kobis.or.kr/kobisopenapi/webservice/rest/movie/searchMovieInfo.json",
-                queryItems: ["key": Bundle.main.API ,"movieCd":selectedMovieCode]
+                queryItems: [
+                    "key": Bundle.main.API,
+                    "movieCd":selectedMovieCode
+                ],
+                headerParameters: [
+                    "Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"
+                ]
             )
             
-            let url = try endPoint.generateURL(isFullPath: false)
+            let url = try networkConfigurer.generateURL(isFullPath: false)
             
             let urlRequest = URLRequest(url: url)
             
@@ -163,7 +178,7 @@ extension DetailViewController {
     }
 }
 
-extension DetailViewController: NetworkConfigurable, Fetchable {
+extension DetailViewController: NetworkConfigurable, BoxOffiecDataFetchable, MoviePosterFetchable {
     var baseURL: String {
         "https://dapi.kakao.com/v2/search/image"
     }
@@ -184,7 +199,17 @@ extension DetailViewController: NetworkConfigurable, Fetchable {
 }
 
 extension DetailViewController {
-//    self.fetchMoviePoster(networkManager: networkManager, headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"], queryParameters: ["query":"\(영화제목+포스터)"], completion: <#T##(String) -> Void#>)
+    func fetchMoviePoster(completion: @escaping (UIImage) -> Void) {
+        self.moviePosterFetcher.fetchMoviePoster(
+            networkManager: networkManager,
+            headers: ["Authorization": "KakaoAK 3072c89de6f543ff508009a001ea12d9"],
+            queryParameters: ["query":"\(movieTitle)+포스터"]
+        ) { moivePosterImgUrl in
+                guard let data = moivePosterImgUrl.data(using: .utf8) else { return }
+                guard let posterImg = UIImage(data: data) else { return }
+                completion(posterImg)
+        }
+    }
 }
 
 
