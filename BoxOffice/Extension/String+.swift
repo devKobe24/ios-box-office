@@ -14,4 +14,11 @@ extension String {
         
         return numberFormatter.string(for: Double(self)) ?? "Error"
     }
+    
+    mutating func formattedDateWithHyphen() -> String {
+        self.insert("-", at: self.index(self.startIndex, offsetBy: 4))
+        self.insert("-", at: self.index(self.endIndex, offsetBy: -2))
+        
+        return self
+    }
 }

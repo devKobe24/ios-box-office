@@ -8,5 +8,5 @@
 import Foundation
 
 public protocol Gettable {
-    func getBoxOfficeData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void)
+    func getData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void)
 }

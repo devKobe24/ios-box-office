@@ -16,7 +16,15 @@ struct Item: Hashable {
     let rankOldAndNew: String?
     let movieCode: String?
     
-    init(rankNumber: String? = nil, rankIntensity: String? = nil, movieName: String? = nil, audienceCount: String? = nil, audienceAccumulated: String? = nil, rankOldAndNew: String? = nil, movieCode: String? = nil) {
+    init(
+        rankNumber: String? = nil,
+        rankIntensity: String? = nil,
+        movieName: String? = nil,
+        audienceCount: String? = nil,
+        audienceAccumulated: String? = nil,
+        rankOldAndNew: String? = nil,
+        movieCode: String? = nil
+    ) {
         self.rankNumber = rankNumber
         self.rankIntensity = rankIntensity
         self.movieName = movieName

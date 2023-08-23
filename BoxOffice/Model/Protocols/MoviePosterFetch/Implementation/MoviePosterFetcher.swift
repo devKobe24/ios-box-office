@@ -5,7 +5,7 @@
 //  Created by Minseong Kang on 2023/08/18.
 //
 
-import Foundation
+import UIKit
 
 class MoviePosterFetcher: MoviePosterFetchable {
     var baseURL: String
@@ -25,7 +25,7 @@ class MoviePosterFetcher: MoviePosterFetchable {
         networkManager: NetworkManager,
         headers: [String: String],
         queryParameters: [String: String],
-        completion: @escaping (_ imgURL: String) -> Void
+        completion: @escaping (Result<UIImage?, FetchDayilyBoxOfficeDataError>) -> Void
     ) {
         queryParameters.forEach { [weak self] (key, value) in
             self?.queryItems = [key: value]
@@ -48,13 +48,26 @@ class MoviePosterFetcher: MoviePosterFetchable {
             
             let urlRequest = try networkConfigurer.generateURLRequest(config: config)
             
-            networkManager.getBoxOfficeData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
+            networkManager.getData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
                 let moviePosterURL = moviePoster.documents[0].imageUrl
-                guard let moviePosterImageURL = MoviePoster(imageUrl: moviePosterURL).imageUrl else { return }
-                completion(moviePosterImageURL)
+                guard let moviePosterImageURL = MoviePoster(imageUrl: moviePosterURL).imageUrl else {
+                    return
+                }
+                
+                guard let url = URL(string: moviePosterImageURL) else { return }
+                
+                // MARK: - 이거 쓰면 안됨, 바꿔야함 -> 메서드 다시 호출하기
+                guard let data = try? Data(contentsOf: url) else {
+                    return
+                }
+                guard let posterImg = UIImage(data: data) else {
+                    return
+                }
+                completion(.success(posterImg))
             }
         } catch {
-            print(error.localizedDescription)
+            completion(.failure(FetchDayilyBoxOfficeDataError.failToFetch))
+            print(FetchDayilyBoxOfficeDataError.failToFetch.description)
         }
     }
 

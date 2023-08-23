@@ -127,7 +127,7 @@ extension ViewController {
             let urlRequest = URLRequest(url: url)
             
             let networkManager = NetworkManager()
-            networkManager.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
+            networkManager.getData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 print(boxOffice)
             }
             

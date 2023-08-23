@@ -7,16 +7,16 @@
 
 import Foundation
 
-struct IndividualMovieDetailInformation: Decodable {
+struct IndividualMovieDetailInformation: Decodable, Hashable {
     let movieInfoResult: MovieInfoResult
 }
 
-struct MovieInfoResult: Decodable {
-    let movieInfo: MovieInfo
+struct MovieInfoResult: Decodable, Hashable {
+    let movieInfo: MovieInformation
     let source: String
 }
 
-struct MovieInfo: Decodable {
+struct MovieInformation: Decodable, Hashable {
     let movieCode: String
     let movieName: String
     let movieEnglishName: String
@@ -56,7 +56,7 @@ struct MovieInfo: Decodable {
     }
 }
 
-struct Actor: Decodable {
+struct Actor: Decodable, Hashable {
     let peopleName: String
     let peopleEnglishName: String
     let castName: String
@@ -70,7 +70,7 @@ struct Actor: Decodable {
     }
 }
 
-struct Genre: Decodable {
+struct Genre: Decodable, Hashable {
     let genreName: String
 
     enum CodingKeys: String, CodingKey {
@@ -78,7 +78,7 @@ struct Genre: Decodable {
     }
 }
 
-struct Nation: Decodable {
+struct Nation: Decodable, Hashable {
     let productionNations: String
 
     enum CodingKeys: String, CodingKey {
@@ -86,7 +86,7 @@ struct Nation: Decodable {
     }
 }
 
-struct Directors: Decodable {
+struct Directors: Decodable, Hashable {
     let directorName: String
     let directorEnglishName: String
 
@@ -96,7 +96,7 @@ struct Directors: Decodable {
     }
 }
 
-struct ShowType: Decodable {
+struct ShowType: Decodable, Hashable{
     let screenTypeClassification: String
     let screenTypeName: String
 
@@ -106,7 +106,7 @@ struct ShowType: Decodable {
     }
 }
 
-struct Audit: Decodable {
+struct Audit: Decodable, Hashable {
     let auditNumber: String
     let watchGradeName: String
 
@@ -116,7 +116,7 @@ struct Audit: Decodable {
     }
 }
 
-struct Company: Decodable {
+struct Company: Decodable, Hashable {
     let companyCode: String
     let companyName: String
     let companyEnglishName: String
@@ -130,7 +130,7 @@ struct Company: Decodable {
     }
 }
 
-struct Staff: Decodable {
+struct Staff: Decodable, Hashable {
     let peopleName: String
     let peopleEnglishName: String
     let staffRoleName: String

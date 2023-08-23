@@ -41,7 +41,7 @@ class BoxOfficeDataFetcher: BoxOffiecDataFetchable {
             
             let urlRequest = URLRequest(url: url)
             
-            networkManager?.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
+            networkManager?.getData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
                 for index in 0...(count-1) {
                     let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber
@@ -81,7 +81,7 @@ class BoxOfficeDataFetcher: BoxOffiecDataFetchable {
             
             let urlRequest = URLRequest(url: url)
             
-            networkManager?.getBoxOfficeData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
+            networkManager?.getData(requestURL: urlRequest) { (boxOffice: BoxOffice) in
                 let count = boxOffice.boxOfficeResult.dailyBoxOfficeList.count
                 for index in 0...(count-1) {
                     let rankNumber = boxOffice.boxOfficeResult.dailyBoxOfficeList[index].rankNumber

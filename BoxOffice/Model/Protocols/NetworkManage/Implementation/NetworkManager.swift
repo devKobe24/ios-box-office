@@ -8,7 +8,7 @@
 import Foundation
 
 struct NetworkManager: Gettable {
-    func getBoxOfficeData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void) {
+    func getData<T: Decodable>(requestURL: URLRequest, completionHandler: @escaping (T) -> Void) {
         let task = URLSession.shared.dataTask(with: requestURL) { data, response, error in
             guard error == nil else {
                 return
