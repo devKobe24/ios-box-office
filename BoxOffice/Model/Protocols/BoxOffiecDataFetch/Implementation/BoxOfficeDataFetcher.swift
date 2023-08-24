@@ -7,7 +7,7 @@
 
 import Foundation
 
-class BoxOfficeDataFetcher: BoxOffiecDataFetchable {
+final class BoxOfficeDataFetcher: BoxOffiecDataFetchable {
     var baseURL: String
     var queryItems: [String : String]?
     var headerParameters: [String : String]?

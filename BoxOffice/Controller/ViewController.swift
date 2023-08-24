@@ -200,8 +200,8 @@ extension ViewController: UICollectionViewDelegate {
             baseURL: "https://dapi.kakao.com/v2/search/image"
         )
         
-        let detailViewController = DetailViewController(selectedMovieCode: selectedMovieCode, movieTitle: movieTitle, moviePosterFetcher: moviePosterFetcher)
-        navigationController?.pushViewController(detailViewController, animated: true)
+//        let detailViewController = DetailViewController(selectedMovieCode: selectedMovieCode, movieTitle: movieTitle, moviePosterFetcher: moviePosterFetcher)
+//        navigationController?.pushViewController(detailViewController, animated: true)
     }
 }
 

@@ -50,6 +50,9 @@
 		BAA6E4962A6F5724000569E2 /* BoxOffice.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6E4952A6F5724000569E2 /* BoxOffice.swift */; };
 		BAA6E4AF2A6F8F6B000569E2 /* BoxOfficeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAA6E4AE2A6F8F6B000569E2 /* BoxOfficeTests.swift */; };
 		BAB7E7A62A8864C60023C4A6 /* DetailViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAB7E7A52A8864C60023C4A6 /* DetailViewController.swift */; };
+		BAD8634A2A96D5FF00EAC375 /* KakaoAPIDataGettable.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD863492A96D5FF00EAC375 /* KakaoAPIDataGettable.swift */; };
+		BAD8634C2A96D6AF00EAC375 /* KakaoAPIDataGetter.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD8634B2A96D6AF00EAC375 /* KakaoAPIDataGetter.swift */; };
+		BAD8634E2A96DD6F00EAC375 /* URL+.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAD8634D2A96DD6F00EAC375 /* URL+.swift */; };
 		BAF0908A2A7F2E550091C1B7 /* Section.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF090892A7F2E550091C1B7 /* Section.swift */; };
 		BAF0908C2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF0908B2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift */; };
 		BAF0908E2A7F325F0091C1B7 /* UICellConfigurationState+.swift in Sources */ = {isa = PBXBuildFile; fileRef = BAF0908D2A7F325F0091C1B7 /* UICellConfigurationState+.swift */; };
@@ -113,6 +116,9 @@
 		BAA6E4AE2A6F8F6B000569E2 /* BoxOfficeTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BoxOfficeTests.swift; sourceTree = "<group>"; };
 		BAA6E4B52A6F8F79000569E2 /* BoxOfficeTestPlan.xctestplan */ = {isa = PBXFileReference; lastKnownFileType = text; path = BoxOfficeTestPlan.xctestplan; sourceTree = "<group>"; };
 		BAB7E7A52A8864C60023C4A6 /* DetailViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailViewController.swift; sourceTree = "<group>"; };
+		BAD863492A96D5FF00EAC375 /* KakaoAPIDataGettable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoAPIDataGettable.swift; sourceTree = "<group>"; };
+		BAD8634B2A96D6AF00EAC375 /* KakaoAPIDataGetter.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = KakaoAPIDataGetter.swift; sourceTree = "<group>"; };
+		BAD8634D2A96DD6F00EAC375 /* URL+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "URL+.swift"; sourceTree = "<group>"; };
 		BAF090892A7F2E550091C1B7 /* Section.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Section.swift; sourceTree = "<group>"; };
 		BAF0908B2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIConfigurationStateCustomKey+.swift"; sourceTree = "<group>"; };
 		BAF0908D2A7F325F0091C1B7 /* UICellConfigurationState+.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UICellConfigurationState+.swift"; sourceTree = "<group>"; };
@@ -249,6 +255,7 @@
 				BA527B132A87674400380A49 /* String+.swift */,
 				BA539E8B2A94426000B77B5B /* CGFloat+.swift */,
 				BA539E8F2A94A5D500B77B5B /* Double+.swift */,
+				BAD8634D2A96DD6F00EAC375 /* URL+.swift */,
 			);
 			path = Extension;
 			sourceTree = "<group>";
@@ -267,6 +274,7 @@
 		BA42F1112A94321900605B41 /* Protocols */ = {
 			isa = PBXGroup;
 			children = (
+				BAD863462A96D58C00EAC375 /* KakaoAPIProtocol */,
 				BA539E912A94DB2500B77B5B /* MovieInformationFetch */,
 				BA99948E2A8F13FD00BF8005 /* ApiDataConfigure */,
 				BA9994952A8F290E00BF8005 /* BoxOffiecDataFetch */,
@@ -424,6 +432,31 @@
 			path = BoxOfficeTests;
 			sourceTree = "<group>";
 		};
+		BAD863462A96D58C00EAC375 /* KakaoAPIProtocol */ = {
+			isa = PBXGroup;
+			children = (
+				BAD863482A96D5BA00EAC375 /* Implementation */,
+				BAD863472A96D5AF00EAC375 /* Interface */,
+			);
+			path = KakaoAPIProtocol;
+			sourceTree = "<group>";
+		};
+		BAD863472A96D5AF00EAC375 /* Interface */ = {
+			isa = PBXGroup;
+			children = (
+				BAD863492A96D5FF00EAC375 /* KakaoAPIDataGettable.swift */,
+			);
+			path = Interface;
+			sourceTree = "<group>";
+		};
+		BAD863482A96D5BA00EAC375 /* Implementation */ = {
+			isa = PBXGroup;
+			children = (
+				BAD8634B2A96D6AF00EAC375 /* KakaoAPIDataGetter.swift */,
+			);
+			path = Implementation;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -545,6 +578,7 @@
 				BAB7E7A62A8864C60023C4A6 /* DetailViewController.swift in Sources */,
 				BA9994A72A8F31CA00BF8005 /* NetworkConfigurable.swift in Sources */,
 				BA04328C2A9032020084D6B7 /* NetworkManager.swift in Sources */,
+				BAD8634E2A96DD6F00EAC375 /* URL+.swift in Sources */,
 				0A96815A2A82239300B78C61 /* CustomListCell.swift in Sources */,
 				BA9994942A8F14DA00BF8005 /* ApiDataNetWorkConfigurer.swift in Sources */,
 				BA04328A2A9031E20084D6B7 /* Gettable.swift in Sources */,
@@ -554,6 +588,7 @@
 				BAF0908C2A7F305B0091C1B7 /* UIConfigurationStateCustomKey+.swift in Sources */,
 				BAA6E4962A6F5724000569E2 /* BoxOffice.swift in Sources */,
 				BA5859502A8C9C0200BE0708 /* IndividualMovieDetailInformation.swift in Sources */,
+				BAD8634C2A96D6AF00EAC375 /* KakaoAPIDataGetter.swift in Sources */,
 				0A96815E2A86086000B78C61 /* DateFormatter+.swift in Sources */,
 				BA539E992A957DA100B77B5B /* MovieInformationItem.swift in Sources */,
 				63DF20EF2970E1A0005DF7D1 /* AppDelegate.swift in Sources */,
@@ -562,6 +597,7 @@
 				BAF0908A2A7F2E550091C1B7 /* Section.swift in Sources */,
 				BA42F1132A9432EA00605B41 /* MovieInformationStackView.swift in Sources */,
 				BA539E942A94DB9600B77B5B /* MovieInformationDataFetchable.swift in Sources */,
+				BAD8634A2A96D5FF00EAC375 /* KakaoAPIDataGettable.swift in Sources */,
 				BA539E8E2A94A3CD00B77B5B /* MovieInformationDataError.swift in Sources */,
 				BA539E902A94A5D500B77B5B /* Double+.swift in Sources */,
 				0A9681562A7CE0C900B78C61 /* NetworkManagerError.swift in Sources */,

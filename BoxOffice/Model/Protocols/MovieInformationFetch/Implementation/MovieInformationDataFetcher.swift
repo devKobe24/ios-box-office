@@ -7,7 +7,7 @@
 
 import Foundation
 
-class MovieInformationDataFetcher: MovieInformationDataFetchable {
+final class MovieInformationDataFetcher: MovieInformationDataFetchable {
     var baseURL: String
     var queryItems: [String : String]?
     var headerParameters: [String : String]?
