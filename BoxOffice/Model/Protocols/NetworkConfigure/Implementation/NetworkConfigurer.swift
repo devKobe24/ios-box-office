@@ -8,6 +8,7 @@
 import Foundation
 
 struct NetworkConfigurer: NetworkConfigurable {
+    
     var baseURL: String
     var queryItems: [String : String]?
     var headerParameters: [String : String]?
@@ -21,14 +22,14 @@ struct NetworkConfigurer: NetworkConfigurable {
         self.headerParameters = headerParameters
     }
     
-    public func generateURLRequest(config: ApiDataConfigurable) throws -> URLRequest {
+    public func generateURLRequest(config: NetworkConfigurable) throws -> URLRequest {
         var urlQureyItems: [URLQueryItem] = []
         
-        var allHeaders: [String: String] = config.headers
-        headerParameters?.forEach({ allHeaders.updateValue($1, forKey: $0) })
+        var allHeaders: [String: String]? = config.headerParameters
+        headerParameters?.forEach({ allHeaders?.updateValue($1, forKey: $0) })
         
         guard var urlComponents = URLComponents(string: baseURL) else {
-            throw NetworkConfigurableError.urlComponents
+            throw NetworkError.urlComponents
         }
         
         queryItems?.forEach {
@@ -38,7 +39,7 @@ struct NetworkConfigurer: NetworkConfigurable {
         urlComponents.queryItems = urlQureyItems
         
         guard let url = urlComponents.url else {
-            throw NetworkConfigurableError.url
+            throw NetworkError.url
         }
         
         var requestURL = URLRequest(url: url)
@@ -49,13 +50,13 @@ struct NetworkConfigurer: NetworkConfigurable {
     
     public func generateURL(isFullPath: Bool) throws -> URL {
         guard let url = URL(string: baseURL) else {
-            throw NetworkConfigurableError.url
+            throw NetworkError.url
         }
         
         let baseURL = url.absoluteString
         
         guard var urlComponents = URLComponents(string: baseURL) else {
-            throw NetworkConfigurableError.urlComponents
+            throw NetworkError.urlComponents
         }
         
         var urlQureyItems: [URLQueryItem] = []
@@ -69,7 +70,7 @@ struct NetworkConfigurer: NetworkConfigurable {
         let fullPathURL = isFullPath ? URL(string: baseURL) : urlComponents.url
         
         guard let urlResult = fullPathURL else {
-            throw NetworkConfigurableError.urlResult
+            throw NetworkError.urlResult
         }
         
         return urlResult

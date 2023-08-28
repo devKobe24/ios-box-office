@@ -8,7 +8,7 @@
 import UIKit
 
 class ItemListCell: UICollectionViewListCell {
-    var item: Item? = nil
+    var item: DailyBoxOfficeList? = nil
     
     override var configurationState: UICellConfigurationState {
         var state = super.configurationState
@@ -16,7 +16,7 @@ class ItemListCell: UICollectionViewListCell {
         return state
     }
     
-    func updateWithItem(_ newItem: Item) {
+    func updateWithItem(_ newItem: DailyBoxOfficeList) {
         guard item != newItem else { return }
         
         item = newItem

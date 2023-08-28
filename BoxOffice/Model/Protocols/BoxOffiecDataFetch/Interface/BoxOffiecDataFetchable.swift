@@ -7,4 +7,4 @@
 
 import Foundation
 
-protocol BoxOffiecDataFetchable: AnyObject, NetworkConfigurable {}
+protocol BoxOffiecDataFetchable: AnyObject { }

@@ -43,4 +43,17 @@ extension KakaoAPIDataGetter: KakaoAPIDataGettable {
         
         return urlRequest
     }
+    
+    var urlAbsoluteString: String? {
+        guard let url = URL(baseURL, path, queries) else { return nil }
+        
+        var urlRequest = URLRequest(url: url)
+        
+        urlRequest.httpMethod = "GET"
+        urlRequest.addValue("KakaoAK 3072c89de6f543ff508009a001ea12d9", forHTTPHeaderField: "Authorization")
+        
+        let urlAbsoluteString = url.absoluteString
+        
+        return urlAbsoluteString
+    }
 }

@@ -34,13 +34,11 @@ final class MovieScrollView: UIScrollView {
     convenience init(
         frame: CGRect,
         movieInformationData: MovieInformation,
-        moviePosterImage: UIImage,
-        movieInformationStackView: MovieInformationStackView
+        moviePosterImage: UIImage
     ) {
         self.init(frame: frame)
         self.movieInformationData = movieInformationData
         self.moviePosterImage = moviePosterImage
-        self.movieInformationStackView = movieInformationStackView
         self.translatesAutoresizingMaskIntoConstraints = false
         
         configureUI()

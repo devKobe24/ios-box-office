@@ -7,4 +7,4 @@
 
 import Foundation
 
-protocol MovieInformationDataFetchable: AnyObject, NetworkConfigurable { }
+protocol MovieInformationDataFetchable: AnyObject, NetworkManagerable {}

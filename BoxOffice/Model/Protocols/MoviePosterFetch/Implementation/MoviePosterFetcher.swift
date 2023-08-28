@@ -21,55 +21,82 @@ class MoviePosterFetcher: MoviePosterFetchable {
         self.headerParameters = headerParameters
     }
     
-    func fetchMoviePoster(
-        networkManager: NetworkManager,
-        headers: [String: String],
-        queryParameters: [String: String],
-        completion: @escaping (Result<UIImage?, FetchDayilyBoxOfficeDataError>) -> Void
-    ) {
-        queryParameters.forEach { [weak self] (key, value) in
-            self?.queryItems = [key: value]
+    func fetchDataForMoviePosterWithURL(
+        completion: @escaping (Result<Data?, NetworkError>) -> Void)
+    {
+        guard let url = URL(string: baseURL) else { return }
+        
+        let task = URLSession.shared.dataTask(with: url) { (data, response, error) in
+            if error != nil {
+                completion(.failure(NetworkError.requestFailed))
+                
+                return
+            }
+            
+            guard let httpReponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpReponse.statusCode) else {
+                completion(.failure(NetworkError.invalidResponse))
+                
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NetworkError.emptyData))
+                
+                return
+            }
+            
+            completion(.success(data))
         }
         
-        do {
-            let networkConfigurer = NetworkConfigurer(
-                baseURL: baseURL,
-                queryItems: queryParameters,
-                headerParameters: headers
-            )
-            
-            let url = try networkConfigurer.generateURL(isFullPath: false)
-            
-            let config = ApiDataNetWorkConfigurer(
-                baseURL: url,
-                headers: headers,
-                queryParameters: queryParameters
-            )
-            
-            let urlRequest = try networkConfigurer.generateURLRequest(config: config)
-            
-            networkManager.getData(requestURL: urlRequest) { (moviePoster: KakaoImageSearchResult) in
-                let moviePosterURL = moviePoster.documents[0].imageUrl
-                guard let moviePosterImageURL = MoviePoster(imageUrl: moviePosterURL).imageUrl else {
-                    return
-                }
+        task.resume()
+    }
+    
+    func fetchDataForMoviePoster(
+        urlRequest: URLRequest?,
+        completion: @escaping (Result<Data?, NetworkError>) -> Void)
+    {
+        guard let urlRequest = urlRequest else { return }
+        
+        let task = URLSession.shared.dataTask(with: urlRequest) { data, response, error in
+            if error != nil {
+                completion(.failure(NetworkError.requestFailed))
                 
-                guard let url = URL(string: moviePosterImageURL) else { return }
-                
-                // MARK: - 이거 쓰면 안됨, 바꿔야함 -> 메서드 다시 호출하기
-                guard let data = try? Data(contentsOf: url) else {
-                    return
-                }
-                guard let posterImg = UIImage(data: data) else {
-                    return
-                }
-                completion(.success(posterImg))
+                return
             }
-        } catch {
-            completion(.failure(FetchDayilyBoxOfficeDataError.failToFetch))
-            print(FetchDayilyBoxOfficeDataError.failToFetch.description)
+            
+            guard let httpResponse = response as? HTTPURLResponse,
+                  (200...299).contains(httpResponse.statusCode) else {
+                completion(.failure(NetworkError.invalidResponse))
+                
+                return
+            }
+            
+            guard let data = data else {
+                completion(.failure(NetworkError.emptyData))
+                
+                return
+            }
+            
+            completion(.success(data))
+        }
+        
+        task.resume()
+    }
+    
+    func fetchMoviePoster(
+        completion: @escaping (Result<UIImage?, NetworkError>) -> Void)
+    {
+        fetchDataForMoviePosterWithURL() { result in
+            switch result {
+            case .success(let data):
+                guard let data = data,
+                      let image = UIImage(data: data) else { return }
+                completion(.success(image))
+            case .failure(let error):
+                completion(.failure(error))
+            }
         }
     }
-
 }
 
